@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <rect width="1200" height="720" fill="#f4f1ea"/>
+  <text x="40" y="48" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#0e2a47">Arquitectura del sistema bancario académico</text>
+  <text x="40" y="76" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#5c5346">Frontend Angular, API REST en Express y MySQL. Datos exclusivamente ficticios.</text>
+
+  <rect x="40" y="110" width="1120" height="150" rx="14" fill="#ffffff" stroke="#d9d0c3"/>
+  <text x="64" y="142" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="700" fill="#1f6f6a">CAPA DE PRESENTACIÓN</text>
+  <rect x="64" y="160" width="250" height="72" rx="10" fill="#0e2a47"/>
+  <text x="84" y="190" font-family="Segoe UI, Arial, sans-serif" font-size="16" fill="#ffffff" font-weight="700">Navegador</text>
+  <text x="84" y="212" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#e7d7b4">Angular + TypeScript</text>
+  <rect x="340" y="160" width="780" height="72" rx="10" fill="#f7f4ee" stroke="#d9d0c3"/>
+  <text x="360" y="190" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#0e2a47" font-weight="700">Pantallas</text>
+  <text x="360" y="212" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#5c5346">Login, clientes, cuentas, operaciones, movimientos, consultas y reporte</text>
+
+  <rect x="40" y="290" width="1120" height="230" rx="14" fill="#ffffff" stroke="#d9d0c3"/>
+  <text x="64" y="322" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="700" fill="#1f6f6a">CAPA DE APLICACIÓN — API REST</text>
+  <rect x="64" y="342" width="200" height="64" rx="10" fill="#1f6f6a"/>
+  <text x="80" y="368" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#ffffff" font-weight="700">Node.js</text>
+  <text x="80" y="388" font-family="Segoe UI, Arial, sans-serif" font-size="12" fill="#e5f4f2">Express + TypeScript</text>
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#0e2a47">
+    <rect x="290" y="342" width="150" height="40" rx="8" fill="#f7f4ee" stroke="#d9d0c3"/>
+    <text x="306" y="367">Autenticación</text>
+    <rect x="452" y="342" width="130" height="40" rx="8" fill="#f7f4ee" stroke="#d9d0c3"/>
+    <text x="480" y="367">Clientes</text>
+    <rect x="594" y="342" width="130" height="40" rx="8" fill="#f7f4ee" stroke="#d9d0c3"/>
+    <text x="624" y="367">Cuentas</text>
+    <rect x="736" y="342" width="170" height="40" rx="8" fill="#f7f4ee" stroke="#d9d0c3"/>
+    <text x="754" y="367">Depósitos / retiros</text>
+    <rect x="918" y="342" width="200" height="40" rx="8" fill="#f7f4ee" stroke="#d9d0c3"/>
+    <text x="948" y="367">Transferencias</text>
+    <rect x="290" y="400" width="170" height="40" rx="8" fill="#f7f4ee" stroke="#d9d0c3"/>
+    <text x="318" y="425">Movimientos</text>
+    <rect x="472" y="400" width="140" height="40" rx="8" fill="#f7f4ee" stroke="#d9d0c3"/>
+    <text x="502" y="425">Consultas</text>
+    <rect x="624" y="400" width="140" height="40" rx="8" fill="#f7f4ee" stroke="#d9d0c3"/>
+    <text x="658" y="425">Reporte</text>
+    <rect x="776" y="400" width="342" height="40" rx="8" fill="#f7f4ee" stroke="#d9d0c3"/>
+    <text x="800" y="425">JWT, bcrypt, validaciones y transacciones SQL</text>
+  </g>
+  <text x="64" y="490" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#5c5346">El token viaja en el encabezado Authorization. El login es la única ruta pública de negocio.</text>
+
+  <rect x="40" y="550" width="1120" height="120" rx="14" fill="#ffffff" stroke="#d9d0c3"/>
+  <text x="64" y="582" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="700" fill="#1f6f6a">CAPA DE DATOS</text>
+  <rect x="64" y="600" width="260" height="48" rx="10" fill="#0e2a47"/>
+  <text x="84" y="630" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#ffffff" font-weight="700">MySQL 8</text>
+  <text x="350" y="630" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#0e2a47">Cliente · Usuario · TipoCuenta · Cuenta · Movimiento · Transferencia</text>
+
+  <path d="M189 232 v58" stroke="#b0893e" stroke-width="2" fill="none" marker-end="url(#flecha)"/>
+  <path d="M189 290 v-20" stroke="#b0893e" stroke-width="2" fill="none"/>
+  <path d="M194 520 v30" stroke="#b0893e" stroke-width="2" fill="none"/>
+  <defs>
+    <marker id="flecha" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#b0893e"/>
+    </marker>
+  </defs>
+</svg>

@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="780" viewBox="0 0 1200 780">
+  <rect width="1200" height="780" fill="#f4f1ea"/>
+  <text x="40" y="46" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#0e2a47">Casos de uso</text>
+  <text x="40" y="74" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#5c5346">Actor único de operación: el cajero autenticado. El cliente bancario no entra al sistema.</text>
+
+  <rect x="300" y="100" width="860" height="640" rx="16" fill="#ffffff" stroke="#0e2a47" stroke-width="2"/>
+  <text x="320" y="132" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#0e2a47">Sistema bancario académico</text>
+
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#0e2a47">
+    <ellipse cx="520" cy="190" rx="150" ry="32" fill="#f7f4ee" stroke="#1f6f6a" stroke-width="2"/>
+    <text x="520" y="195" text-anchor="middle">Iniciar sesión</text>
+    <ellipse cx="860" cy="190" rx="150" ry="32" fill="#f7f4ee" stroke="#1f6f6a" stroke-width="2"/>
+    <text x="860" y="195" text-anchor="middle">Cerrar sesión</text>
+
+    <ellipse cx="520" cy="280" rx="170" ry="32" fill="#f7f4ee" stroke="#0e2a47"/>
+    <text x="520" y="285" text-anchor="middle">Registrar cliente</text>
+    <ellipse cx="860" cy="280" rx="170" ry="32" fill="#f7f4ee" stroke="#0e2a47"/>
+    <text x="860" y="285" text-anchor="middle">Consultar clientes</text>
+
+    <ellipse cx="520" cy="370" rx="170" ry="32" fill="#f7f4ee" stroke="#0e2a47"/>
+    <text x="520" y="375" text-anchor="middle">Modificar cliente</text>
+    <ellipse cx="860" cy="370" rx="170" ry="32" fill="#f7f4ee" stroke="#0e2a47"/>
+    <text x="860" y="375" text-anchor="middle">Desactivar cliente</text>
+
+    <ellipse cx="520" cy="460" rx="170" ry="32" fill="#f7f4ee" stroke="#0e2a47"/>
+    <text x="520" y="465" text-anchor="middle">Crear cuenta</text>
+    <ellipse cx="860" cy="460" rx="180" ry="32" fill="#f7f4ee" stroke="#0e2a47"/>
+    <text x="860" y="465" text-anchor="middle">Consultar saldo y estado</text>
+
+    <ellipse cx="430" cy="550" rx="140" ry="32" fill="#fff8ea" stroke="#b0893e" stroke-width="2"/>
+    <text x="430" y="555" text-anchor="middle">Depositar</text>
+    <ellipse cx="690" cy="550" rx="130" ry="32" fill="#fff8ea" stroke="#b0893e" stroke-width="2"/>
+    <text x="690" y="555" text-anchor="middle">Retirar</text>
+    <ellipse cx="960" cy="550" rx="150" ry="32" fill="#fff8ea" stroke="#b0893e" stroke-width="2"/>
+    <text x="960" y="555" text-anchor="middle">Transferir</text>
+
+    <ellipse cx="520" cy="650" rx="190" ry="32" fill="#f7f4ee" stroke="#0e2a47"/>
+    <text x="520" y="655" text-anchor="middle">Consultar movimientos</text>
+    <ellipse cx="880" cy="650" rx="180" ry="32" fill="#f7f4ee" stroke="#0e2a47"/>
+    <text x="880" y="655" text-anchor="middle">Ver reporte</text>
+  </g>
+
+  <circle cx="120" cy="250" r="36" fill="#0e2a47"/>
+  <path d="M80 360 q40-70 80 0 v20 h-80 z" fill="#0e2a47"/>
+  <text x="120" y="410" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#0e2a47">Cajero</text>
+  <text x="120" y="432" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="12" fill="#5c5346">operador ficticio</text>
+
+  <g stroke="#8d8376" stroke-width="1.4" fill="none">
+    <path d="M160 300 C240 300 300 190 370 190"/>
+    <path d="M160 320 C260 360 300 280 350 280"/>
+    <path d="M160 340 C250 400 300 370 350 370"/>
+    <path d="M160 350 C240 460 280 460 350 460"/>
+    <path d="M160 360 C230 520 250 550 290 550"/>
+    <path d="M155 370 C240 560 300 650 330 650"/>
+  </g>
+</svg>

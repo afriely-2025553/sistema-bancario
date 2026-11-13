@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="760" viewBox="0 0 980 760">
+  <rect width="980" height="760" fill="#f4f1ea"/>
+  <text x="40" y="46" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#0e2a47">Flujo de inicio de sesión</text>
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#0e2a47">
+    <rect x="340" y="80" width="300" height="52" rx="26" fill="#0e2a47"/>
+    <text x="490" y="112" text-anchor="middle" fill="#ffffff">Inicio</text>
+    <rect x="300" y="180" width="380" height="56" rx="8" fill="#ffffff" stroke="#0e2a47"/>
+    <text x="490" y="214" text-anchor="middle">El cajero envía usuario y contraseña</text>
+    <polygon points="490,280 680,340 490,400 300,340" fill="#fff8ea" stroke="#b0893e" stroke-width="2"/>
+    <text x="490" y="336" text-anchor="middle">¿Usuario activo</text>
+    <text x="490" y="356" text-anchor="middle">y contraseña válida?</text>
+    <rect x="300" y="450" width="380" height="56" rx="8" fill="#e7f4f1" stroke="#1f6f6a"/>
+    <text x="490" y="484" text-anchor="middle">Se entrega JWT y se abre el panel</text>
+    <rect x="680" y="300" width="250" height="70" rx="8" fill="#fdecec" stroke="#9b2c2c"/>
+    <text x="805" y="330" text-anchor="middle" fill="#9b2c2c">401</text>
+    <text x="805" y="350" text-anchor="middle" fill="#9b2c2c">Mensaje de error</text>
+    <rect x="340" y="560" width="300" height="52" rx="26" fill="#0e2a47"/>
+    <text x="490" y="592" text-anchor="middle" fill="#ffffff">Fin</text>
+    <path d="M490 132 V180 M490 236 V280 M490 400 V450 M490 506 V560" stroke="#0e2a47" stroke-width="1.6" fill="none"/>
+    <path d="M680 340 H680" stroke="#9b2c2c" stroke-width="1.6"/>
+    <text x="500" y="430" fill="#1f6f6a">Sí</text>
+    <text x="690" y="300" fill="#9b2c2c">No</text>
+  </g>
+</svg>

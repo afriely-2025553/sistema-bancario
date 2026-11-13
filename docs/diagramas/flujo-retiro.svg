@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="900" viewBox="0 0 980 900">
+  <rect width="980" height="900" fill="#f4f1ea"/>
+  <text x="40" y="46" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#0e2a47">Flujo de retiro</text>
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#0e2a47">
+    <rect x="330" y="80" width="280" height="48" rx="24" fill="#0e2a47"/>
+    <text x="470" y="110" text-anchor="middle" fill="#ffffff">Inicio</text>
+    <rect x="250" y="160" width="440" height="52" rx="8" fill="#ffffff" stroke="#0e2a47"/>
+    <text x="470" y="192" text-anchor="middle">Bloquear la fila de la cuenta (FOR UPDATE)</text>
+    <polygon points="470,250 680,310 470,370 260,310" fill="#fff8ea" stroke="#b0893e" stroke-width="2"/>
+    <text x="470" y="306" text-anchor="middle">¿Cuenta activa,</text>
+    <text x="470" y="326" text-anchor="middle">cliente activo y monto &gt; 0?</text>
+    <polygon points="470,410 700,480 470,550 240,480" fill="#fff8ea" stroke="#b0893e" stroke-width="2"/>
+    <text x="470" y="476" text-anchor="middle">¿Saldo disponible</text>
+    <text x="470" y="496" text-anchor="middle">mayor o igual al monto?</text>
+    <rect x="250" y="590" width="440" height="70" rx="8" fill="#e7f4f1" stroke="#1f6f6a"/>
+    <text x="470" y="618" text-anchor="middle">Restar saldo e insertar</text>
+    <text x="470" y="640" text-anchor="middle">movimiento de retiro. Confirmar.</text>
+    <rect x="730" y="450" width="210" height="70" rx="8" fill="#fdecec" stroke="#9b2c2c"/>
+    <text x="835" y="478" text-anchor="middle" fill="#9b2c2c">Rechazar</text>
+    <text x="835" y="498" text-anchor="middle" fill="#9b2c2c">Revertir transacción</text>
+    <rect x="330" y="710" width="280" height="48" rx="24" fill="#0e2a47"/>
+    <text x="470" y="740" text-anchor="middle" fill="#ffffff">Fin</text>
+    <path d="M470 128 V160 M470 212 V250 M470 370 V410 M470 550 V590 M470 660 V710" stroke="#0e2a47" fill="none" stroke-width="1.6"/>
+    <path d="M700 480 H730" stroke="#9b2c2c" fill="none"/>
+    <text x="500" y="400" fill="#1f6f6a">Sí</text>
+    <text x="708" y="468" fill="#9b2c2c">No</text>
+  </g>
+</svg>
