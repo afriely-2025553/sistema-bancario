@@ -54,7 +54,7 @@ El actor que opera el sistema es el cajero (u otro operador autenticado). El cli
 
 | Caso de uso | Resultado |
 | --- | --- |
-| Iniciar sesión | Token si las credenciales ficticias son válidas; error en caso contrario. |
+| Iniciar sesión | Token si las credenciales son válidas; error en caso contrario. |
 | Cerrar sesión | La interfaz olvida el token. |
 | Registrar, consultar, modificar y desactivar cliente | Ficha persistida. La baja es lógica. |
 | Crear cuenta y consultar saldo | Cuenta ligada a un cliente y a un tipo. |
@@ -71,7 +71,7 @@ El diagrama está en `docs/diagramas/casos-de-uso.svg`.
 
 ### 4.1 Inicio de sesión
 
-1. El operador escribe usuario y contraseña ficticios.
+1. El operador escribe usuario y contraseña.
 2. La API busca el usuario activo.
 3. Compara la contraseña con bcrypt.
 4. Si coincide, firma un JWT con identificador, usuario y rol.
@@ -113,7 +113,7 @@ Diagrama: `docs/diagramas/flujo-transferencia.svg`.
 | Estado de cuenta distinto del cliente | La regla 9 habla de la cuenta. Un cliente inactivo también bloquea operaciones para no seguir usando sus cuentas. |
 | Movimiento y transferencia separados | La transferencia es la operación entre dos cuentas. Cada cuenta necesita su propio movimiento de salida o entrada. |
 | Montos en `DECIMAL(15,2)` | Evita el error de binario de los números de punto flotante en el saldo guardado. |
-| Tope de 1 000 000.00 por operación | Límite académico para rechazar montos absurdos en datos ficticios. |
+| Tope de 1 000 000.00 por operación | Límite por operación para rechazar montos fuera de rango. |
 | Dos roles, mismo permiso operativo | El trabajo es individual y el alcance no pide permisos distintos. El rol igual queda guardado en el token y en la operación. |
 
 ## 6. Manejo de errores previsto
@@ -129,7 +129,7 @@ Diagrama: `docs/diagramas/flujo-transferencia.svg`.
 
 ## 7. Seguridad académica
 
-- Las credenciales de prueba son ficticias y se documentan en el README.
+- Las credenciales de prueba se documentan en el README («Credenciales ficticias de prueba») y no aparecen en la interfaz.
 - El secreto JWT de desarrollo es una clave de práctica, no un secreto de producción.
 - No hay números de tarjeta ni documentos reales.
 - CORS permite el origen del frontend de desarrollo.

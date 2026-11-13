@@ -1,30 +1,32 @@
+(node:127404) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
 newman
 
 Sistema bancario académico
 
 ❏ Pruebas P001-P010
 ↳ P001 Login válido
-  POST http://localhost:3000/api/auth/login [200 OK, 613B, 81ms]
+  POST http://localhost:3000/api/auth/login [200 OK, 590B, 106ms]
   ✓  P001 permite el acceso
 
 ↳ P002 Login inválido
-  POST http://localhost:3000/api/auth/login [401 Unauthorized, 341B, 67ms]
+  POST http://localhost:3000/api/auth/login [401 Unauthorized, 341B, 68ms]
   ✓  P002 muestra error y no entrega token
 
 ↳ P003 Registrar cliente
-  POST http://localhost:3000/api/clientes [201 Created, 555B, 8ms]
+  POST http://localhost:3000/api/clientes [201 Created, 544B, 7ms]
   ✓  P003 almacena el cliente
 
 ↳ P004 Crear cuenta
-  POST http://localhost:3000/api/cuentas [201 Created, 503B, 8ms]
+  POST http://localhost:3000/api/cuentas [201 Created, 501B, 6ms]
   ✓  P004 asocia la cuenta al cliente
 
 ↳ P005 Depósito válido
-  POST http://localhost:3000/api/depositos [201 Created, 546B, 6ms]
+  POST http://localhost:3000/api/depositos [201 Created, 545B, 6ms]
   ✓  P005 incrementa el saldo
 
 ↳ P006 Retiro con saldo
-  POST http://localhost:3000/api/retiros [201 Created, 541B, 6ms]
+  POST http://localhost:3000/api/retiros [201 Created, 541B, 5ms]
   ✓  P006 disminuye el saldo
 
 ↳ P007 Retiro superior al saldo
@@ -32,15 +34,15 @@ Sistema bancario académico
   ✓  P007 rechaza el retiro
 
 ↳ P007b El saldo no cambió
-  GET http://localhost:3000/api/cuentas/7/saldo [200 OK, 366B, 3ms]
+  GET http://localhost:3000/api/cuentas/7/saldo [200 OK, 364B, 2ms]
   ✓  P007 el saldo permanece
 
 ↳ P008a Cuenta destino
-  POST http://localhost:3000/api/cuentas [201 Created, 506B, 6ms]
+  POST http://localhost:3000/api/cuentas [201 Created, 504B, 6ms]
   ✓  Cuenta destino creada
 
 ↳ P008 Transferencia válida
-  POST http://localhost:3000/api/transferencias [201 Created, 1.19kB, 6ms]
+  POST http://localhost:3000/api/transferencias [201 Created, 1.19kB, 5ms]
   ✓  P008 actualiza ambas cuentas
 
 ↳ P009 Transferencia a la misma cuenta
@@ -48,48 +50,48 @@ Sistema bancario académico
   ✓  P009 rechaza la misma cuenta
 
 ↳ P010a Desactivar cuenta
-  PATCH http://localhost:3000/api/cuentas/8/estado [200 OK, 504B, 6ms]
+  PATCH http://localhost:3000/api/cuentas/8/estado [200 OK, 502B, 3ms]
   ✓  La cuenta queda inactiva
 
 ↳ P010 Cuenta inactiva
-  POST http://localhost:3000/api/depositos [400 Bad Request, 342B, 3ms]
+  POST http://localhost:3000/api/depositos [400 Bad Request, 342B, 2ms]
   ✓  P010 no permite la operación
 
 ❏ Consultas y reporte
 ↳ Listar clientes
-  GET http://localhost:3000/api/clientes?q= [200 OK, 1.74kB, 3ms]
+  GET http://localhost:3000/api/clientes?q= [200 OK, 1.77kB, 3ms]
 
 ↳ Listar cuentas
-  GET http://localhost:3000/api/cuentas [200 OK, 2.26kB, 2ms]
+  GET http://localhost:3000/api/cuentas [200 OK, 2.3kB, 2ms]
 
 ↳ Movimientos de la cuenta
-  GET http://localhost:3000/api/movimientos/cuenta/7 [200 OK, 1.12kB, 2ms]
+  GET http://localhost:3000/api/movimientos/cuenta/7 [200 OK, 1.11kB, 4ms]
 
 ↳ Consulta por texto
-  GET http://localhost:3000/api/consultas?q=Ficticio [200 OK, 3.79kB, 2ms]
+  GET http://localhost:3000/api/consultas?q=Lopez [200 OK, 1.13kB, 2ms]
 
 ↳ Reporte de operaciones
-  GET http://localhost:3000/api/reportes/operaciones [200 OK, 2.88kB, 4ms]
+  GET http://localhost:3000/api/reportes/operaciones [200 OK, 2.87kB, 4ms]
 
 ↳ Cerrar sesión
-  POST http://localhost:3000/api/auth/logout [200 OK, 350B, 1ms]
+  POST http://localhost:3000/api/auth/logout [200 OK, 279B, 2ms]
 
-┌─────────────────────────┬──────────────────┬──────────────────┐
-│                         │         executed │           failed │
-├─────────────────────────┼──────────────────┼──────────────────┤
-│              iterations │                1 │                0 │
-├─────────────────────────┼──────────────────┼──────────────────┤
-│                requests │               19 │                0 │
-├─────────────────────────┼──────────────────┼──────────────────┤
-│            test-scripts │               13 │                0 │
-├─────────────────────────┼──────────────────┼──────────────────┤
-│      prerequest-scripts │                0 │                0 │
-├─────────────────────────┼──────────────────┼──────────────────┤
-│              assertions │               13 │                0 │
-├─────────────────────────┴──────────────────┴──────────────────┤
-│ total run duration: 444ms                                     │
-├───────────────────────────────────────────────────────────────┤
-│ total data received: 13.98kB (approx)                         │
-├───────────────────────────────────────────────────────────────┤
-│ average response time: 11ms [min: 1ms, max: 81ms, s.d.: 21ms] │
-└───────────────────────────────────────────────────────────────┘
+┌─────────────────────────┬───────────────────┬──────────────────┐
+│                         │          executed │           failed │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│              iterations │                 1 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│                requests │                19 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│            test-scripts │                13 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│      prerequest-scripts │                 0 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│              assertions │                13 │                0 │
+├─────────────────────────┴───────────────────┴──────────────────┤
+│ total run duration: 463ms                                      │
+├────────────────────────────────────────────────────────────────┤
+│ total data received: 11.29kB (approx)                          │
+├────────────────────────────────────────────────────────────────┤
+│ average response time: 12ms [min: 2ms, max: 106ms, s.d.: 26ms] │
+└────────────────────────────────────────────────────────────────┘

@@ -93,7 +93,7 @@ Los espacios de nombre, institución, docente, grado y fechas quedan en blanco p
 
 El sistema se considera logrado cuando:
 
-- Una persona con credenciales ficticias inicia sesión y, si las credenciales fallan, ve un error.
+- Una persona con credenciales de prueba inicia sesión y, si las credenciales fallan, ve un error.
 - Puede registrar un cliente, crear una cuenta asociada y consultar el saldo.
 - Un depósito aumenta el saldo, un retiro válido lo disminuye y un retiro mayor al saldo se rechaza.
 - Una transferencia válida actualiza las dos cuentas y una transferencia a la misma cuenta se rechaza.
@@ -119,6 +119,6 @@ El sistema se considera logrado cuando:
 ## 10. Supuestos
 
 - Habrá un servidor MySQL local accesible para quien evalúe el proyecto.
-- Los usuarios del sistema son operadores ficticios (cajero y administrador), no los clientes bancarios.
+- Los usuarios del sistema son operadores (cajero y administrador), no los clientes bancarios.
 - El cliente bancario no inicia sesión: lo atiende el operador autenticado.
-- Los montos usan dos decimales y una moneda ficticia sin código de divisa real obligatorio. En pantalla se muestra como moneda académica (Q, quetzal de práctica), sin vínculo con una entidad.
+- Los montos usan dos decimales y se muestran en quetzales (Q), con separador de miles.

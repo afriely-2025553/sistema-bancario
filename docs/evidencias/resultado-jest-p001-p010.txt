@@ -4,20 +4,20 @@
 
 PASS tests/p001-p010.test.ts
   Pruebas obligatorias P001-P010
-    ✓ P001 login válido permite el acceso (99 ms)
-    ✓ P002 login inválido muestra mensaje de error (70 ms)
-    ✓ P003 registrar cliente lo almacena (80 ms)
-    ✓ P004 crear cuenta la asocia al cliente (82 ms)
-    ✓ P005 depósito válido incrementa el saldo (88 ms)
-    ✓ P006 retiro con saldo suficiente disminuye el saldo (83 ms)
-    ✓ P007 retiro superior al saldo es rechazado (82 ms)
-    ✓ P008 transferencia válida actualiza ambas cuentas (94 ms)
-    ✓ P009 transferencia a la misma cuenta es rechazada (79 ms)
-    ✓ P010 cuenta inactiva no permite operaciones (97 ms)
+    ✓ P001 login válido permite el acceso (106 ms)
+    ✓ P002 login inválido muestra mensaje de error (71 ms)
+    ✓ P003 registrar cliente lo almacena (79 ms)
+    ✓ P004 crear cuenta la asocia al cliente (84 ms)
+    ✓ P005 depósito válido incrementa el saldo (91 ms)
+    ✓ P006 retiro con saldo suficiente disminuye el saldo (82 ms)
+    ✓ P007 retiro superior al saldo es rechazado (87 ms)
+    ✓ P008 transferencia válida actualiza ambas cuentas (95 ms)
+    ✓ P009 transferencia a la misma cuenta es rechazada (80 ms)
+    ✓ P010 cuenta inactiva no permite operaciones (108 ms)
 
 Test Suites: 1 passed, 1 total
 Tests:       10 passed, 10 total
 Snapshots:   0 total
-Time:        1.914 s, estimated 3 s
+Time:        2.084 s, estimated 4 s
 Ran all test suites.
 Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?

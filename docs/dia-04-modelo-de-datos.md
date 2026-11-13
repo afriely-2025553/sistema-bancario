@@ -28,13 +28,13 @@ Catálogo del producto de cuenta.
 
 ### Cliente
 
-Persona ficticia titular de cuentas. La desactivación no borra la fila.
+Persona titular de cuentas. La desactivación no borra la fila.
 
 | Columna | Tipo | Restricción |
 | --- | --- | --- |
 | id | INT | PK |
 | codigo | VARCHAR(20) | Único. Formato CLI-0001 |
-| identificacion | VARCHAR(30) | Única. Documento ficticio |
+| identificacion | VARCHAR(30) | Única. Documento de identificación (DPI o pasaporte) |
 | nombres | VARCHAR(80) | Obligatorio |
 | apellidos | VARCHAR(80) | Obligatorio |
 | fecha_nacimiento | DATE | Opcional |
@@ -53,7 +53,7 @@ Operador del sistema. No es el cliente bancario.
 | id | INT | PK |
 | nombre_usuario | VARCHAR(50) | Único |
 | contrasena_hash | VARCHAR(255) | Hash bcrypt, nunca la contraseña en claro |
-| nombre_completo | VARCHAR(150) | Etiqueta del operador ficticio |
+| nombre_completo | VARCHAR(150) | Nombre visible del operador |
 | rol | ENUM | administrador o cajero |
 | activo | TINYINT(1) | Un inactivo no inicia sesión |
 | fecha_creacion | DATETIME | Alta |
@@ -147,7 +147,7 @@ La semilla deja un historial coherente con el saldo:
 
 La transferencia TRF-00000001 mueve 199.50 de la cuenta 2 a la cuenta 3.
 
-## 5. Usuarios ficticios de la semilla
+## 5. Usuarios de la semilla
 
 | Usuario | Contraseña de práctica | Rol | Activo |
 | --- | --- | --- | --- |

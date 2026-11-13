@@ -12,21 +12,21 @@
 
 ## 1. Descripción de la solución
 
-El sistema ofrece a un operador autenticado el registro de clientes ficticios, la apertura de cuentas y la ejecución de depósitos, retiros y transferencias. Cada operación actualiza el saldo dentro de una transacción y deja un movimiento con fecha, tipo, monto y cuentas involucradas. El operador puede consultar y obtener un resumen de la actividad.
+El sistema ofrece a un operador autenticado el registro de clientes, la apertura de cuentas y la ejecución de depósitos, retiros y transferencias. Cada operación actualiza el saldo dentro de una transacción y deja un movimiento con fecha, tipo, monto y cuentas involucradas. El operador puede consultar y obtener un resumen de la actividad.
 
 ## 2. Actores
 
 | Actor | Descripción |
 | --- | --- |
-| Operador cajero | Usuario ficticio que inicia sesión y ejecuta el día a día: clientes, cuentas y operaciones. |
-| Operador administrador | Usuario ficticio con el mismo alcance operativo en esta versión académica. El rol queda guardado para identificar quién operó. |
-| Cliente bancario | Persona ficticia registrada en el sistema. No inicia sesión. |
+| Operador cajero | Usuario del sistema que inicia sesión y ejecuta el día a día: clientes, cuentas y operaciones. |
+| Operador administrador | Usuario del sistema con el mismo alcance operativo en esta versión académica. El rol queda guardado para identificar quién operó. |
+| Cliente bancario | Persona registrada en el sistema. No inicia sesión. |
 
 ## 3. Requerimientos funcionales
 
 | ID | Requerimiento | Módulo |
 | --- | --- | --- |
-| RF-01 | El sistema permite iniciar sesión con usuario y contraseña ficticios. | Autenticación |
+| RF-01 | El sistema permite iniciar sesión con usuario y contraseña. | Autenticación |
 | RF-02 | El sistema rechaza credenciales incorrectas o usuarios inactivos y no entrega un token. | Autenticación |
 | RF-03 | El operador autenticado puede cerrar la sesión en la interfaz. | Autenticación |
 | RF-04 | El sistema registra un cliente con identificación, nombres, apellidos y correo. | Clientes |
@@ -89,7 +89,7 @@ Cada historia usa la forma «Como… quiero… para…» y sirve de base a las p
 
 ### HU-01 Iniciar sesión con credenciales válidas
 
-Como cajero, quiero iniciar sesión con un usuario y una contraseña ficticios para entrar al sistema.
+Como cajero, quiero iniciar sesión con mi usuario y mi contraseña para entrar al sistema.
 
 Criterios de aceptación:
 
@@ -101,7 +101,7 @@ Prueba relacionada: P001.
 
 ### HU-02 Rechazar un inicio de sesión inválido
 
-Como cajero, quiero que el sistema rechace una contraseña incorrecta para impedir el acceso de quien no conoce la credencial ficticia.
+Como cajero, quiero que el sistema rechace una contraseña incorrecta para impedir el acceso de quien no conoce la credencial.
 
 Criterios de aceptación:
 
@@ -113,7 +113,7 @@ Prueba relacionada: P002.
 
 ### HU-03 Registrar un cliente
 
-Como cajero, quiero registrar un cliente ficticio para poder abrirle cuentas después.
+Como cajero, quiero registrar un cliente para poder abrirle cuentas después.
 
 Criterios de aceptación:
 
@@ -274,7 +274,7 @@ Criterios de aceptación:
 
 ### HU-18 Ver el reporte de operaciones
 
-Como cajero, quiero un resumen de depósitos, retiros y transferencias para conocer la actividad ficticia del periodo.
+Como cajero, quiero un resumen de depósitos, retiros y transferencias para conocer la actividad del periodo.
 
 Criterios de aceptación:
 
