@@ -1,0 +1,132 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NG_CLI_ANALYTICS: 'false'
+  DB_HOST: 127.0.0.1
+  DB_PORT: '3306'
+  DB_USER: banco_app
+  DB_PASSWORD: BancoFicticio123!
+  DB_NAME: banco_academico
+  JWT_SECRET: clave-ficticia-academica-sistema-bancario
+  JWT_EXPIRES_IN: 8h
+
+jobs:
+  backend:
+    name: Backend, MySQL y pruebas P001-P010
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root-ficticio
+          MYSQL_DATABASE: banco_academico
+          MYSQL_USER: banco_app
+          MYSQL_PASSWORD: BancoFicticio123!
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot-ficticio"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=30
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Obtener el código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Permitir a banco_app la base de pruebas
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -uroot -proot-ficticio -e "GRANT ALL PRIVILEGES ON \`banco_academico_test\`.* TO 'banco_app'@'%'; FLUSH PRIVILEGES;"
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar TypeScript
+        run: npm run build
+
+      - name: Inicializar la base (schema.sql y seed.sql)
+        run: npm run db:init
+
+      - name: Pruebas Jest P001-P010
+        run: npm test
+
+      - name: Arrancar la API
+        run: |
+          mkdir -p ../logs
+          nohup npm start > ../logs/backend.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3000/api/salud; then echo; exit 0; fi
+            sleep 2
+          done
+          cat ../logs/backend.log
+          exit 1
+
+      - name: Colección de Postman con Newman
+        run: |
+          npx --yes newman@6 run ../postman/sistema-bancario.postman_collection.json \
+            -e ../postman/sistema-bancario.local.postman_environment.json \
+            --env-var baseUrl=http://127.0.0.1:3000/api \
+            --reporters cli,junit \
+            --reporter-junit-export ../logs/newman-junit.xml
+
+      - name: Guardar registros
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: registros-backend
+          path: logs/
+          if-no-files-found: ignore
+
+  frontend:
+    name: Frontend Angular (build de producción)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Obtener el código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Build de producción
+        run: npm run build -- --configuration production
+
+      - name: Guardar el build
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist/
