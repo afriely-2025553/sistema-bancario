@@ -1,28 +1,39 @@
+<a class="saltar" href="#contenido">Saltar al contenido</a>
 <div class="shell">
-  <aside class="barra">
-    <div class="marca">
-      <span class="marca-sello">BA</span>
-      <div>
-        <strong>Banco de aula</strong>
-        <small>Datos ficticios</small>
-      </div>
-    </div>
-    <nav>
-      <a routerLink="/inicio" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
-      <a routerLink="/clientes" routerLinkActive="activo">Clientes</a>
-      <a routerLink="/cuentas" routerLinkActive="activo">Cuentas</a>
-      <a routerLink="/operaciones" routerLinkActive="activo">Operaciones</a>
-      <a routerLink="/movimientos" routerLinkActive="activo">Movimientos</a>
-      <a routerLink="/consultas" routerLinkActive="activo">Consultas</a>
-      <a routerLink="/reporte" routerLinkActive="activo">Reporte</a>
+  <header class="barra-movil">
+    <a class="marca" routerLink="/inicio">
+      <span class="marca-sello" aria-hidden="true">BC</span>
+      <span class="marca-nombre">Banco Ceiba</span>
+    </a>
+    <button type="button" (click)="menuAbierto.set(true)" aria-controls="menu-principal" [attr.aria-expanded]="menuAbierto()">Menú</button>
+  </header>
+  @if (menuAbierto()) { <div class="velo" (click)="menuAbierto.set(false)" aria-hidden="true"></div> }
+  <aside class="barra" id="menu-principal" [class.abierta]="menuAbierto()" (keydown.escape)="menuAbierto.set(false)">
+    <a class="marca" routerLink="/inicio">
+      <span class="marca-sello" aria-hidden="true">BC</span>
+      <span class="marca-nombre">Banco Ceiba</span>
+    </a>
+    <nav aria-label="Menú principal">
+      @for (enlace of enlaces; track enlace.ruta) {
+        <a [routerLink]="enlace.ruta" routerLinkActive="activo" ariaCurrentWhenActive="page">{{ enlace.texto }}</a>
+      }
     </nav>
     <div class="sesion">
-      <p>{{ auth.usuario()?.nombreCompleto }}</p>
-      <small>{{ etiquetaRol(auth.usuario()?.rol || 'cajero') }} · {{ auth.usuario()?.nombreUsuario }}</small>
-      <button type="button" class="boton secundario" (click)="salir()">Cerrar sesión</button>
+      <span class="sesion-nombre">{{ auth.usuario()?.nombreCompleto }}</span>
+      <span class="sesion-rol">{{ etiquetaRol(auth.usuario()?.rol || 'cajero') }} · {{ auth.usuario()?.nombreUsuario }}</span>
+      <button type="button" class="boton en-barra pequeno" (click)="salir()">Cerrar sesión</button>
     </div>
   </aside>
-  <section class="contenido">
+  <main class="contenido" id="contenido" tabindex="-1">
     <router-outlet />
-  </section>
+  </main>
 </div>
+<div class="avisos" aria-live="polite">
+  @for (aviso of avisos.lista(); track aviso.id) {
+    <div class="alerta" [class.ok]="aviso.tipo === 'ok'" [class.error]="aviso.tipo === 'error'" [class.info]="aviso.tipo === 'info'" role="status">
+      <span>{{ aviso.texto }}</span>
+      <button type="button" class="cerrar-aviso" (click)="avisos.cerrar(aviso.id)" aria-label="Cerrar aviso">×</button>
+    </div>
+  }
+</div>
+<app-dialogo-confirmacion />

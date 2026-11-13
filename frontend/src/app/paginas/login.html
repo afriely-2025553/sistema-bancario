@@ -1,39 +1,46 @@
-<section class="login">
-  <div class="login-lado">
-    <p class="marca-kicker">Taller 2 · práctica académica</p>
-    <h1>Banco de aula</h1>
-    <p class="login-lead">
-      Registro de clientes, cuentas y operaciones simuladas. Todo el contenido de este sistema es ficticio.
-    </p>
-    <ul class="login-puntos">
-      <li>Depósitos, retiros y transferencias con saldo controlado</li>
-      <li>Historial de movimientos y reporte de operaciones</li>
-      <li>Las cuentas inactivas no pueden operar</li>
-    </ul>
+<main class="acceso">
+  <div class="acceso-caja">
+    <div class="acceso-marca">
+      <span class="marca-sello" aria-hidden="true">BC</span>
+      <span class="marca-nombre">Banco Ceiba</span>
+    </div>
+    <section class="panel">
+      <form class="panel-cuerpo formulario" [formGroup]="formulario" (ngSubmit)="entrar()" novalidate>
+        <div>
+          <h1>Iniciar sesión</h1>
+          <p class="suave">Ingrese con su usuario de operador.</p>
+        </div>
+        @if (sesionExpirada && !error()) {
+          <p class="alerta info" role="status">Su sesión expiró. Vuelva a iniciar sesión.</p>
+        }
+        @if (error()) {
+          <p class="alerta error" role="alert">{{ error() }}</p>
+        }
+        <div class="campo">
+          <label for="usuario">Usuario</label>
+          <input id="usuario" formControlName="nombreUsuario" autocomplete="username" autocapitalize="none"
+                 spellcheck="false" [attr.aria-invalid]="!!errorUsuario()" aria-describedby="usuario-error" />
+          @if (errorUsuario()) { <span id="usuario-error" class="error-campo">{{ errorUsuario() }}</span> }
+        </div>
+        <div class="campo">
+          <label for="contrasena">Contraseña</label>
+          <div class="contrasena">
+            <input id="contrasena" [type]="verContrasena() ? 'text' : 'password'" formControlName="contrasena"
+                   autocomplete="current-password" (keyup)="revisarMayusculas($event)" (keydown)="revisarMayusculas($event)"
+                   [attr.aria-invalid]="!!errorContrasena()" aria-describedby="contrasena-error contrasena-mayus" />
+            <button type="button" (click)="verContrasena.set(!verContrasena())"
+                    [attr.aria-pressed]="verContrasena()" [attr.aria-label]="verContrasena() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+              {{ verContrasena() ? 'Ocultar' : 'Mostrar' }}
+            </button>
+          </div>
+          @if (errorContrasena()) { <span id="contrasena-error" class="error-campo">{{ errorContrasena() }}</span> }
+          @if (mayusculas()) { <span id="contrasena-mayus" class="ayuda">Bloq Mayús está activado.</span> }
+        </div>
+        <button class="boton" type="submit" [disabled]="enviando()">
+          @if (enviando()) { <span class="giro" aria-hidden="true"></span> Ingresando… } @else { Ingresar }
+        </button>
+      </form>
+    </section>
+    <p class="acceso-pie">© {{ anio }} Banco Ceiba · Taller 2</p>
   </div>
-  <div class="login-panel">
-    <form class="tarjeta estrecha" [formGroup]="formulario" (ngSubmit)="entrar()">
-      <p class="sobre">Acceso del operador</p>
-      <h2>Iniciar sesión</h2>
-      @if (error()) {
-        <p class="alerta error" role="alert">{{ error() }}</p>
-      }
-      <label>
-        Usuario
-        <input formControlName="nombreUsuario" autocomplete="username" />
-      </label>
-      <label>
-        Contraseña
-        <input type="password" formControlName="contrasena" autocomplete="current-password" />
-      </label>
-      <button class="boton" type="submit" [disabled]="enviando()">
-        {{ enviando() ? 'Comprobando…' : 'Entrar' }}
-      </button>
-      <div class="credenciales">
-        <p>Credenciales ficticias de práctica</p>
-        <code>cajero / Cajero123!</code>
-        <code>administrador / Admin123!</code>
-      </div>
-    </form>
-  </div>
-</section>
+</main>
