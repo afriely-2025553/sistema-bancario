@@ -127,7 +127,14 @@ input:focus, select:focus {
   gap: 22px;
 }
 .marca { display: flex; gap: 10px; align-items: center; }
+.marca div { display: flex; flex-direction: column; line-height: 1.25; }
+.marca strong { font-size: 15px; }
 .marca small, .sesion small { color: #c8bfb1; }
+.sesion .boton.secundario {
+  color: #f7f1e6;
+  border-color: rgba(247, 241, 230, 0.45);
+  background: transparent;
+}
 .marca-sello {
   width: 42px;
   height: 42px;

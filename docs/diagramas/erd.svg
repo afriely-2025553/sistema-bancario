@@ -83,7 +83,7 @@
       <text x="190" y="24" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">Movimiento</text>
       <text x="16" y="58" font-size="13" fill="#1f6f6a" font-weight="700">PK id</text>
       <text x="16" y="80" font-size="13" fill="#b0893e" font-weight="700">FK cuenta_id</text>
-      <text x="16" y="102" font-size="13" fill="#b0893e" font-weight="700">FK transferencia_id (opcional)</text>
+      <text x="16" y="102" font-size="13" fill="#b0893e" font-weight="700">FK transferencia_id</text>
       <text x="16" y="124" font-size="13" fill="#b0893e" font-weight="700">FK usuario_id</text>
       <text x="16" y="146" font-size="13" fill="#0e2a47">tipo</text>
       <text x="16" y="168" font-size="13" fill="#0e2a47">monto</text>
@@ -92,7 +92,7 @@
     </g>
   </g>
 
-  <g stroke="#1f6f6a" stroke-width="1.8" fill="none" font-family="Segoe UI, Arial, sans-serif" font-size="12" fill="#1f6f6a">
+  <g stroke="#1f6f6a" stroke-width="1.8" fill="none" font-family="Segoe UI, Arial, sans-serif" font-size="12">
     <path d="M320 210 H390 V340 H460" stroke="#1f6f6a"/>
     <text x="360" y="200" fill="#1f6f6a" stroke="none">1</text>
     <text x="400" y="330" fill="#1f6f6a" stroke="none">N  posee</text>

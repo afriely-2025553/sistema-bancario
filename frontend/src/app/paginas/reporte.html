@@ -23,20 +23,21 @@
   </section>
   <section class="tarjeta">
     <h3>Detalle del periodo</h3>
-    @if (datos.ultimasOperaciones.length === 0) {
+    @if (movimientos().length === 0) {
       <p class="vacio">No hay operaciones en el periodo.</p>
     } @else {
       <table>
         <thead>
-          <tr><th>Fecha</th><th>Cuenta</th><th>Tipo</th><th>Monto</th><th>Descripción</th></tr>
+          <tr><th>Fecha</th><th>Cuenta</th><th>Tipo</th><th>Monto</th><th>Saldo posterior</th><th>Descripción</th></tr>
         </thead>
         <tbody>
-          @for (movimiento of datos.ultimasOperaciones; track movimiento.id) {
+          @for (movimiento of movimientos(); track movimiento.id) {
             <tr>
               <td>{{ fecha(movimiento.fecha) }}</td>
               <td>{{ movimiento.numeroCuenta }}</td>
               <td>{{ etiquetaTipo(movimiento.tipo) }}</td>
               <td>{{ moneda(movimiento.monto) }}</td>
+              <td>{{ moneda(movimiento.saldoPosterior) }}</td>
               <td>{{ movimiento.descripcion }}</td>
             </tr>
           }

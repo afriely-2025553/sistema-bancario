@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Api } from '../core/api';
-import { Reporte, etiquetaTipo, fecha, moneda } from '../core/modelos';
+import { Movimiento, Reporte, etiquetaTipo, fecha, moneda } from '../core/modelos';
 import { mensajeError } from '../core/texto-error';
 
 @Component({
@@ -16,6 +16,7 @@ export class ReportePagina {
   readonly fecha = fecha;
   readonly etiquetaTipo = etiquetaTipo;
   readonly reporte = signal<Reporte | null>(null);
+  readonly movimientos = signal<Movimiento[]>([]);
   readonly error = signal('');
   readonly filtros = this.fb.nonNullable.group({ desde: [''], hasta: [''] });
 
@@ -25,8 +26,14 @@ export class ReportePagina {
 
   cargar(): void {
     const valor = this.filtros.getRawValue();
-    this.api.reporte(valor.desde || undefined, valor.hasta || undefined).subscribe({
+    const desde = valor.desde || undefined;
+    const hasta = valor.hasta || undefined;
+    this.api.reporte(desde, hasta).subscribe({
       next: (datos) => this.reporte.set(datos),
+      error: (error: unknown) => this.error.set(mensajeError(error)),
+    });
+    this.api.movimientos(undefined, desde, hasta).subscribe({
+      next: (lista) => this.movimientos.set(lista),
       error: (error: unknown) => this.error.set(mensajeError(error)),
     });
   }

@@ -105,6 +105,10 @@ export function fecha(valor: string | null | undefined): string {
   if (!valor) {
     return '—';
   }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+    const [anio, mes, dia] = valor.split('-');
+    return `${dia}/${mes}/${anio}`;
+  }
   const normalizada = valor.includes('T') ? valor : valor.replace(' ', 'T');
   const instante = new Date(normalizada);
   if (Number.isNaN(instante.getTime())) {

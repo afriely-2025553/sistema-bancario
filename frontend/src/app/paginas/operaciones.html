@@ -5,9 +5,9 @@
   </div>
 </header>
 <div class="pestanas">
-  <button type="button" [class.activa]="pestana() === 'deposito'" (click)="pestana.set('deposito')">Depósito</button>
-  <button type="button" [class.activa]="pestana() === 'retiro'" (click)="pestana.set('retiro')">Retiro</button>
-  <button type="button" [class.activa]="pestana() === 'transferencia'" (click)="pestana.set('transferencia')">Transferencia</button>
+  <button type="button" [class.activa]="pestana() === 'deposito'" (click)="cambiar('deposito')">Depósito</button>
+  <button type="button" [class.activa]="pestana() === 'retiro'" (click)="cambiar('retiro')">Retiro</button>
+  <button type="button" [class.activa]="pestana() === 'transferencia'" (click)="cambiar('transferencia')">Transferencia</button>
 </div>
 @if (mensaje()) { <p class="alerta ok">{{ mensaje() }}</p> }
 @if (error()) { <p class="alerta error">{{ error() }}</p> }

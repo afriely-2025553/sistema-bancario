@@ -49,6 +49,12 @@ export class Operaciones {
     });
   }
 
+  cambiar(pestana: 'deposito' | 'retiro' | 'transferencia'): void {
+    this.pestana.set(pestana);
+    this.error.set('');
+    this.mensaje.set('');
+  }
+
   depositar(): void {
     if (this.deposito.invalid) {
       this.deposito.markAllAsTouched();
