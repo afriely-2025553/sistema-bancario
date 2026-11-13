@@ -1,72 +1,178 @@
-<header class="encabezado">
+<header class="pagina-encabezado">
   <div>
-    <p class="sobre">Ventanilla</p>
-    <h2>Operaciones</h2>
+    <h1>Operaciones</h1>
+    <p class="descripcion">Registre depósitos, retiros y transferencias entre cuentas activas.</p>
   </div>
 </header>
-<div class="pestanas">
-  <button type="button" [class.activa]="pestana() === 'deposito'" (click)="cambiar('deposito')">Depósito</button>
-  <button type="button" [class.activa]="pestana() === 'retiro'" (click)="cambiar('retiro')">Retiro</button>
-  <button type="button" [class.activa]="pestana() === 'transferencia'" (click)="cambiar('transferencia')">Transferencia</button>
-</div>
-@if (mensaje()) { <p class="alerta ok">{{ mensaje() }}</p> }
-@if (error()) { <p class="alerta error">{{ error() }}</p> }
-@if (pestana() === 'deposito') {
-  <form class="tarjeta formulario" [formGroup]="deposito" (ngSubmit)="depositar()">
-    <div class="campos">
-      <label>Cuenta
-        <select formControlName="cuentaId">
-          <option value="">Seleccione</option>
-          @for (cuenta of cuentas(); track cuenta.id) {
-            <option [value]="cuenta.id">{{ cuenta.numeroCuenta }} · {{ cuenta.clienteNombre }} · {{ moneda(cuenta.saldo) }}</option>
+
+<section class="panel form-ancho">
+  <div class="pestanas" role="tablist" aria-label="Tipo de operación" (keydown)="moverPestana($event)">
+    @for (tipo of tipos; track tipo) {
+      <button type="button" role="tab" [id]="'pestana-' + tipo" [attr.aria-selected]="pestana() === tipo"
+              [attr.tabindex]="pestana() === tipo ? 0 : -1" aria-controls="panel-operacion" (click)="cambiar(tipo)">
+        {{ nombres[tipo] }}
+      </button>
+    }
+  </div>
+
+  <div class="panel-cuerpo" id="panel-operacion" role="tabpanel" [attr.aria-labelledby]="'pestana-' + pestana()">
+    @if (cargando()) {
+      <div class="estado-carga" role="status"><span class="giro" aria-hidden="true"></span> Cargando cuentas…</div>
+    } @else if (comprobante(); as recibo) {
+      <div class="comprobante" role="status">
+        <p class="alerta ok"><strong>{{ recibo.titulo }}.</strong></p>
+        <dl class="datos">
+          <div><dt>Referencia</dt><dd class="num">{{ recibo.referencia }}</dd></div>
+          <div><dt>Fecha</dt><dd class="num">{{ recibo.fecha }}</dd></div>
+          <div><dt>Monto</dt><dd class="num"><strong>{{ moneda(recibo.monto) }}</strong></dd></div>
+          @for (fila of recibo.filas; track fila.etiqueta) {
+            <div><dt>{{ fila.etiqueta }}</dt><dd class="num">{{ fila.valor }}</dd></div>
           }
-        </select>
-      </label>
-      <label>Monto<input type="number" step="0.01" min="0.01" formControlName="monto" /></label>
-      <label class="ancho">Descripción<input formControlName="descripcion" /></label>
-    </div>
-    <button class="boton" type="submit">Registrar depósito</button>
-  </form>
-}
-@if (pestana() === 'retiro') {
-  <form class="tarjeta formulario" [formGroup]="retiro" (ngSubmit)="retirar()">
-    <div class="campos">
-      <label>Cuenta
-        <select formControlName="cuentaId">
-          <option value="">Seleccione</option>
-          @for (cuenta of cuentas(); track cuenta.id) {
-            <option [value]="cuenta.id">{{ cuenta.numeroCuenta }} · {{ cuenta.clienteNombre }} · {{ moneda(cuenta.saldo) }}</option>
-          }
-        </select>
-      </label>
-      <label>Monto<input type="number" step="0.01" min="0.01" formControlName="monto" /></label>
-      <label class="ancho">Descripción<input formControlName="descripcion" /></label>
-    </div>
-    <button class="boton" type="submit">Registrar retiro</button>
-  </form>
-}
-@if (pestana() === 'transferencia') {
-  <form class="tarjeta formulario" [formGroup]="transferencia" (ngSubmit)="transferir()">
-    <div class="campos">
-      <label>Cuenta origen
-        <select formControlName="cuentaOrigenId">
-          <option value="">Seleccione</option>
-          @for (cuenta of cuentas(); track cuenta.id) {
-            <option [value]="cuenta.id">{{ cuenta.numeroCuenta }} · {{ moneda(cuenta.saldo) }}</option>
-          }
-        </select>
-      </label>
-      <label>Cuenta destino
-        <select formControlName="cuentaDestinoId">
-          <option value="">Seleccione</option>
-          @for (cuenta of cuentas(); track cuenta.id) {
-            <option [value]="cuenta.id">{{ cuenta.numeroCuenta }} · {{ cuenta.clienteNombre }}</option>
-          }
-        </select>
-      </label>
-      <label>Monto<input type="number" step="0.01" min="0.01" formControlName="monto" /></label>
-      <label>Concepto<input formControlName="concepto" /></label>
-    </div>
-    <button class="boton" type="submit">Transferir</button>
-  </form>
-}
+        </dl>
+        <div class="formulario-pie">
+          <a class="boton secundario" [routerLink]="['/cuentas', recibo.cuentaId]">Ver cuenta</a>
+          <button type="button" class="boton" (click)="nuevaOperacion()">Registrar otra operación</button>
+        </div>
+      </div>
+    } @else {
+      @if (error()) { <p class="alerta error" role="alert">{{ error() }}</p> }
+      @if (operables().length === 0) {
+        <div class="estado-vacio">
+          <strong>No hay cuentas disponibles para operar</strong>
+          <span>Se necesita al menos una cuenta activa de un cliente activo.</span>
+          <a class="boton" routerLink="/cuentas/nueva">Abrir cuenta</a>
+        </div>
+      } @else if (pestana() === 'deposito') {
+        <form class="formulario" [formGroup]="deposito" (ngSubmit)="depositar()" novalidate>
+          <div class="campos">
+            <div class="campo ancho">
+              <label for="dep-cuenta">Cuenta</label>
+              <select id="dep-cuenta" formControlName="cuentaId" [attr.aria-invalid]="!!errorDe(deposito, 'cuentaId', { required: 'Seleccione la cuenta.' })" aria-describedby="dep-cuenta-error">
+                <option value="">Seleccione una cuenta</option>
+                @for (cuenta of operables(); track cuenta.id) {
+                  <option [value]="cuenta.id">{{ cuenta.numeroCuenta }} · {{ cuenta.clienteNombre }}</option>
+                }
+              </select>
+              @if (errorDe(deposito, 'cuentaId', { required: 'Seleccione la cuenta.' }); as mensaje) { <span id="dep-cuenta-error" class="error-campo">{{ mensaje }}</span> }
+            </div>
+            @if (cuentaDeposito(); as cuenta) {
+              <div class="resumen-cuenta ancho">
+                <div><span>Titular</span><strong>{{ cuenta.clienteNombre }}</strong></div>
+                <div><span>Tipo</span><strong>{{ cuenta.tipoCuenta }}</strong></div>
+                <div><span>Saldo disponible</span><strong>{{ moneda(cuenta.saldo) }}</strong></div>
+              </div>
+            }
+            <div class="campo">
+              <label for="dep-monto">Monto</label>
+              <div class="entrada-moneda"><span aria-hidden="true">Q</span>
+                <input id="dep-monto" type="number" inputmode="decimal" step="0.01" min="0.01" formControlName="monto" placeholder="0.00"
+                       [attr.aria-invalid]="!!errorMonto(deposito, false)" aria-describedby="dep-monto-error" />
+              </div>
+              @if (errorMonto(deposito, false); as mensaje) { <span id="dep-monto-error" class="error-campo">{{ mensaje }}</span> }
+            </div>
+            <div class="campo">
+              <label for="dep-descripcion">Descripción <span class="opcional">(opcional)</span></label>
+              <input id="dep-descripcion" formControlName="descripcion" maxlength="255" placeholder="Depósito en ventanilla" />
+            </div>
+          </div>
+          <div class="formulario-pie">
+            <button class="boton" type="submit" [disabled]="enviando()">
+              @if (enviando()) { <span class="giro" aria-hidden="true"></span> Procesando… } @else { Continuar }
+            </button>
+          </div>
+        </form>
+      } @else if (pestana() === 'retiro') {
+        <form class="formulario" [formGroup]="retiro" (ngSubmit)="retirar()" novalidate>
+          <div class="campos">
+            <div class="campo ancho">
+              <label for="ret-cuenta">Cuenta</label>
+              <select id="ret-cuenta" formControlName="cuentaId" [attr.aria-invalid]="!!errorDe(retiro, 'cuentaId', { required: 'Seleccione la cuenta.' })" aria-describedby="ret-cuenta-error">
+                <option value="">Seleccione una cuenta</option>
+                @for (cuenta of operables(); track cuenta.id) {
+                  <option [value]="cuenta.id">{{ cuenta.numeroCuenta }} · {{ cuenta.clienteNombre }}</option>
+                }
+              </select>
+              @if (errorDe(retiro, 'cuentaId', { required: 'Seleccione la cuenta.' }); as mensaje) { <span id="ret-cuenta-error" class="error-campo">{{ mensaje }}</span> }
+            </div>
+            @if (cuentaRetiro(); as cuenta) {
+              <div class="resumen-cuenta ancho">
+                <div><span>Titular</span><strong>{{ cuenta.clienteNombre }}</strong></div>
+                <div><span>Tipo</span><strong>{{ cuenta.tipoCuenta }}</strong></div>
+                <div><span>Saldo disponible</span><strong>{{ moneda(cuenta.saldo) }}</strong></div>
+              </div>
+            }
+            <div class="campo">
+              <label for="ret-monto">Monto</label>
+              <div class="entrada-moneda"><span aria-hidden="true">Q</span>
+                <input id="ret-monto" type="number" inputmode="decimal" step="0.01" min="0.01" formControlName="monto" placeholder="0.00"
+                       [attr.aria-invalid]="!!errorMonto(retiro, excedeRetiro(), cuentaRetiro())" aria-describedby="ret-monto-error" />
+              </div>
+              @if (errorMonto(retiro, excedeRetiro(), cuentaRetiro()); as mensaje) { <span id="ret-monto-error" class="error-campo">{{ mensaje }}</span> }
+            </div>
+            <div class="campo">
+              <label for="ret-descripcion">Descripción <span class="opcional">(opcional)</span></label>
+              <input id="ret-descripcion" formControlName="descripcion" maxlength="255" placeholder="Retiro en ventanilla" />
+            </div>
+          </div>
+          <div class="formulario-pie">
+            <button class="boton" type="submit" [disabled]="enviando()">
+              @if (enviando()) { <span class="giro" aria-hidden="true"></span> Procesando… } @else { Continuar }
+            </button>
+          </div>
+        </form>
+      } @else {
+        <form class="formulario" [formGroup]="transferencia" (ngSubmit)="transferir()" novalidate>
+          <div class="campos">
+            <div class="campo">
+              <label for="trf-origen">Cuenta de origen</label>
+              <select id="trf-origen" formControlName="cuentaOrigenId" [attr.aria-invalid]="!!errorDe(transferencia, 'cuentaOrigenId', { required: 'Seleccione la cuenta de origen.' })" aria-describedby="trf-origen-ayuda">
+                <option value="">Seleccione una cuenta</option>
+                @for (cuenta of operables(); track cuenta.id) {
+                  <option [value]="cuenta.id">{{ cuenta.numeroCuenta }} · {{ cuenta.clienteNombre }}</option>
+                }
+              </select>
+              @if (errorDe(transferencia, 'cuentaOrigenId', { required: 'Seleccione la cuenta de origen.' }); as mensaje) {
+                <span id="trf-origen-ayuda" class="error-campo">{{ mensaje }}</span>
+              } @else if (cuentaOrigen(); as cuenta) {
+                <span id="trf-origen-ayuda" class="ayuda">Saldo disponible: <strong>{{ moneda(cuenta.saldo) }}</strong></span>
+              }
+            </div>
+            <div class="campo">
+              <label for="trf-destino">Cuenta de destino</label>
+              <select id="trf-destino" formControlName="cuentaDestinoId" [attr.aria-invalid]="!!errorDe(transferencia, 'cuentaDestinoId', { required: 'Seleccione la cuenta de destino.' })" aria-describedby="trf-destino-ayuda">
+                <option value="">Seleccione una cuenta</option>
+                @for (cuenta of destinos(); track cuenta.id) {
+                  <option [value]="cuenta.id">{{ cuenta.numeroCuenta }} · {{ cuenta.clienteNombre }}</option>
+                }
+              </select>
+              @if (errorDe(transferencia, 'cuentaDestinoId', { required: 'Seleccione la cuenta de destino.' }); as mensaje) {
+                <span id="trf-destino-ayuda" class="error-campo">{{ mensaje }}</span>
+              } @else if (cuentaDestino(); as cuenta) {
+                <span id="trf-destino-ayuda" class="ayuda">Titular: {{ cuenta.clienteNombre }} · {{ cuenta.tipoCuenta }}</span>
+              } @else {
+                <span id="trf-destino-ayuda" class="ayuda">No se puede elegir la misma cuenta de origen.</span>
+              }
+            </div>
+            <div class="campo">
+              <label for="trf-monto">Monto</label>
+              <div class="entrada-moneda"><span aria-hidden="true">Q</span>
+                <input id="trf-monto" type="number" inputmode="decimal" step="0.01" min="0.01" formControlName="monto" placeholder="0.00"
+                       [attr.aria-invalid]="!!errorMonto(transferencia, excedeTransferencia(), cuentaOrigen())" aria-describedby="trf-monto-error" />
+              </div>
+              @if (errorMonto(transferencia, excedeTransferencia(), cuentaOrigen()); as mensaje) { <span id="trf-monto-error" class="error-campo">{{ mensaje }}</span> }
+            </div>
+            <div class="campo">
+              <label for="trf-concepto">Concepto <span class="opcional">(opcional)</span></label>
+              <input id="trf-concepto" formControlName="concepto" maxlength="255" placeholder="Pago de alquiler" />
+            </div>
+          </div>
+          <div class="formulario-pie">
+            <button class="boton" type="submit" [disabled]="enviando()">
+              @if (enviando()) { <span class="giro" aria-hidden="true"></span> Procesando… } @else { Continuar }
+            </button>
+          </div>
+        </form>
+      }
+    }
+  </div>
+</section>

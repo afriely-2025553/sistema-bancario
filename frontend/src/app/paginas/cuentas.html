@@ -1,42 +1,95 @@
-<header class="encabezado">
+<header class="pagina-encabezado">
   <div>
-    <p class="sobre">Productos</p>
-    <h2>Cuentas</h2>
+    <h1>Cuentas</h1>
+    @if (!cargando() && !error()) {
+      <p class="descripcion">
+        @if (hayFiltros()) { {{ filtradas().length }} de {{ cuentas().length }} cuentas · saldo {{ moneda(saldoFiltrado()) }} }
+        @else { {{ cuentas().length }} {{ cuentas().length === 1 ? 'cuenta' : 'cuentas' }} · saldo total {{ moneda(saldoFiltrado()) }} }
+      </p>
+    }
   </div>
   <a class="boton" routerLink="/cuentas/nueva">Abrir cuenta</a>
 </header>
-<form class="filtros" [formGroup]="busqueda" (ngSubmit)="cargar()">
-  <input formControlName="q" placeholder="Número, código o nombre del cliente" />
-  <button class="boton secundario" type="submit">Buscar</button>
-</form>
-@if (error()) { <p class="alerta error">{{ error() }}</p> }
-<section class="tarjeta">
-  @if (cuentas().length === 0) {
-    <p class="vacio">No hay cuentas con ese criterio.</p>
+
+<section class="panel">
+  <div class="filtros" role="search">
+    <div class="campo crece">
+      <label for="buscar-cuenta">Buscar</label>
+      <input id="buscar-cuenta" type="search" [ngModel]="texto()" (ngModelChange)="filtrar('texto', $event)"
+             placeholder="Número de cuenta, código o nombre del cliente" />
+    </div>
+    <div class="campo">
+      <label for="tipo-cuenta">Tipo</label>
+      <select id="tipo-cuenta" [ngModel]="tipo()" (ngModelChange)="filtrar('tipo', $event)">
+        <option value="">Todos</option>
+        @for (nombre of tipos(); track nombre) { <option [value]="nombre">{{ nombre }}</option> }
+      </select>
+    </div>
+    <div class="campo">
+      <label for="estado-cuenta">Estado</label>
+      <select id="estado-cuenta" [ngModel]="estado()" (ngModelChange)="filtrar('estado', $event)">
+        <option value="todas">Todas</option>
+        <option value="activa">Activas</option>
+        <option value="inactiva">Inactivas</option>
+      </select>
+    </div>
+    @if (hayFiltros()) {
+      <button type="button" class="boton secundario" (click)="limpiar()">Limpiar filtros</button>
+    }
+  </div>
+
+  @if (cargando()) {
+    <div class="estado-carga" role="status"><span class="giro" aria-hidden="true"></span> Cargando cuentas…</div>
+  } @else if (error()) {
+    <div class="panel-cuerpo">
+      <div class="alerta error" role="alert">
+        <span>{{ error() }}</span>
+        <button type="button" class="boton secundario pequeno" (click)="cargar()">Reintentar</button>
+      </div>
+    </div>
+  } @else if (cuentas().length === 0) {
+    <div class="estado-vacio">
+      <strong>Aún no hay cuentas</strong>
+      <span>Abra una cuenta para un cliente activo.</span>
+      <a class="boton" routerLink="/cuentas/nueva">Abrir cuenta</a>
+    </div>
+  } @else if (filtradas().length === 0) {
+    <div class="estado-vacio">
+      <strong>Sin resultados</strong>
+      <span>Ninguna cuenta coincide con los filtros aplicados.</span>
+      <button type="button" class="boton secundario" (click)="limpiar()">Limpiar filtros</button>
+    </div>
   } @else {
-    <table>
-      <thead>
-        <tr>
-          <th>Número</th>
-          <th>Cliente</th>
-          <th>Tipo</th>
-          <th>Saldo</th>
-          <th>Estado</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (cuenta of cuentas(); track cuenta.id) {
+    <div class="tabla-contenedor">
+      <table>
+        <caption class="solo-lectores">Listado de cuentas</caption>
+        <thead>
           <tr>
-            <td>{{ cuenta.numeroCuenta }}</td>
-            <td>{{ cuenta.clienteCodigo }} · {{ cuenta.clienteNombre }}</td>
-            <td>{{ cuenta.tipoCuenta }}</td>
-            <td>{{ moneda(cuenta.saldo) }}</td>
-            <td><span class="pildora" [class.off]="cuenta.estado !== 'activa'">{{ cuenta.estado === 'activa' ? 'Activa' : 'Inactiva' }}</span></td>
-            <td class="acciones"><a [routerLink]="['/cuentas', cuenta.id]">Ver</a></td>
+            <th scope="col">Número</th>
+            <th scope="col">Titular</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Apertura</th>
+            <th scope="col">Estado</th>
+            <th scope="col" class="derecha">Saldo</th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (cuenta of visibles(); track cuenta.id) {
+            <tr>
+              <td class="num"><a class="celda-principal" [routerLink]="['/cuentas', cuenta.id]">{{ cuenta.numeroCuenta }}</a></td>
+              <td>
+                <a [routerLink]="['/clientes', cuenta.clienteId]">{{ cuenta.clienteNombre }}</a>
+                <span class="celda-secundaria">{{ cuenta.clienteCodigo }}{{ cuenta.clienteActivo ? '' : ' · cliente inactivo' }}</span>
+              </td>
+              <td>{{ cuenta.tipoCuenta }}</td>
+              <td class="num">{{ soloFecha(cuenta.fechaApertura) }}</td>
+              <td><span class="etiqueta-estado" [class.inactivo]="cuenta.estado !== 'activa'">{{ cuenta.estado === 'activa' ? 'Activa' : 'Inactiva' }}</span></td>
+              <td class="derecha num">{{ moneda(cuenta.saldo) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-paginador [total]="filtradas().length" [(pagina)]="pagina" />
   }
 </section>

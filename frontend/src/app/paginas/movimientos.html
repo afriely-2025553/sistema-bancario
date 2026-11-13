@@ -1,44 +1,93 @@
-<header class="encabezado">
+<header class="pagina-encabezado">
   <div>
-    <p class="sobre">Historial</p>
-    <h2>Movimientos</h2>
+    <h1>Movimientos</h1>
+    <p class="descripcion">Historial de depósitos, retiros y transferencias, del más reciente al más antiguo.</p>
   </div>
 </header>
-<form class="filtros" [formGroup]="filtros" (ngSubmit)="cargar()">
-  <select formControlName="cuentaId">
-    <option value="">Todas las cuentas</option>
-    @for (cuenta of cuentas(); track cuenta.id) {
-      <option [value]="cuenta.id">{{ cuenta.numeroCuenta }}</option>
-    }
-  </select>
-  <input type="date" formControlName="desde" />
-  <input type="date" formControlName="hasta" />
-  <button class="boton secundario" type="submit">Filtrar</button>
-</form>
-@if (error()) { <p class="alerta error">{{ error() }}</p> }
-<section class="tarjeta">
-  @if (movimientos().length === 0) {
-    <p class="vacio">No hay movimientos para el filtro.</p>
-  } @else {
-    <table>
-      <thead>
-        <tr>
-          <th>Fecha</th><th>Cuenta</th><th>Tipo</th><th>Monto</th><th>Saldo posterior</th><th>Contraparte</th><th>Descripción</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (movimiento of movimientos(); track movimiento.id) {
-          <tr>
-            <td>{{ fecha(movimiento.fecha) }}</td>
-            <td>{{ movimiento.numeroCuenta }}</td>
-            <td>{{ etiquetaTipo(movimiento.tipo) }}</td>
-            <td>{{ moneda(movimiento.monto) }}</td>
-            <td>{{ moneda(movimiento.saldoPosterior) }}</td>
-            <td>{{ movimiento.cuentaContraparte || '—' }}</td>
-            <td>{{ movimiento.descripcion }}</td>
-          </tr>
+
+<section class="panel">
+  <form class="filtros" [formGroup]="filtros" (ngSubmit)="cargar()" role="search" novalidate>
+    <div class="campo crece">
+      <label for="mov-cuenta">Cuenta</label>
+      <select id="mov-cuenta" formControlName="cuentaId">
+        <option value="">Todas las cuentas</option>
+        @for (cuenta of cuentas(); track cuenta.id) {
+          <option [value]="cuenta.id">{{ cuenta.numeroCuenta }} · {{ cuenta.clienteNombre }}</option>
         }
-      </tbody>
-    </table>
+      </select>
+    </div>
+    <div class="campo">
+      <label for="mov-tipo">Tipo</label>
+      <select id="mov-tipo" formControlName="tipo">
+        <option value="">Todos</option>
+        <option value="deposito">Depósitos</option>
+        <option value="retiro">Retiros</option>
+        <option value="transferencia">Transferencias</option>
+      </select>
+    </div>
+    <div class="campo">
+      <label for="mov-desde">Desde</label>
+      <input id="mov-desde" type="date" formControlName="desde" [max]="hoy" [attr.aria-invalid]="!!errorFechas()" aria-describedby="mov-fechas-error" />
+    </div>
+    <div class="campo">
+      <label for="mov-hasta">Hasta</label>
+      <input id="mov-hasta" type="date" formControlName="hasta" [max]="hoy" [attr.aria-invalid]="!!errorFechas()" aria-describedby="mov-fechas-error" />
+    </div>
+    <div class="grupo-acciones">
+      <button class="boton" type="submit">Aplicar</button>
+      <button class="boton secundario" type="button" (click)="limpiar()">Limpiar</button>
+    </div>
+    @if (errorFechas()) { <span id="mov-fechas-error" class="error-campo">{{ errorFechas() }}</span> }
+  </form>
+
+  @if (cargando()) {
+    <div class="estado-carga" role="status"><span class="giro" aria-hidden="true"></span> Cargando movimientos…</div>
+  } @else if (error()) {
+    <div class="panel-cuerpo">
+      <div class="alerta error" role="alert">
+        <span>{{ error() }}</span>
+        <button type="button" class="boton secundario pequeno" (click)="cargar()">Reintentar</button>
+      </div>
+    </div>
+  } @else if (filtrados().length === 0) {
+    <div class="estado-vacio">
+      <strong>Sin movimientos</strong>
+      <span>No hay movimientos que coincidan con los filtros. Pruebe con otra cuenta o con un periodo más amplio.</span>
+    </div>
+  } @else {
+    <div class="totales-filtro">
+      <div><span>Movimientos</span><strong>{{ filtrados().length }}</strong></div>
+      <div><span>Entradas</span><strong class="monto-entrada">+{{ moneda(entradas()) }}</strong></div>
+      <div><span>Salidas</span><strong class="monto-salida">−{{ moneda(salidas()) }}</strong></div>
+    </div>
+    <div class="tabla-contenedor">
+      <table>
+        <caption class="solo-lectores">Movimientos</caption>
+        <thead>
+          <tr>
+            <th scope="col">Fecha</th><th scope="col">Cuenta</th><th scope="col">Tipo</th><th scope="col">Descripción</th>
+            <th scope="col" class="derecha">Monto</th><th scope="col" class="derecha">Saldo</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (movimiento of visibles(); track movimiento.id) {
+            <tr>
+              <td class="num">{{ fecha(movimiento.fecha) }}</td>
+              <td class="num"><a [routerLink]="['/cuentas', movimiento.cuentaId]">{{ movimiento.numeroCuenta }}</a></td>
+              <td>{{ etiquetaTipo(movimiento.tipo) }}</td>
+              <td>
+                {{ movimiento.descripcion || '—' }}
+                @if (movimiento.cuentaContraparte) {
+                  <span class="celda-secundaria">{{ movimiento.tipo === 'transferencia_salida' ? 'Hacia' : 'Desde' }} {{ movimiento.cuentaContraparte }} · {{ movimiento.referencia }}</span>
+                }
+              </td>
+              <td class="derecha num" [class.monto-entrada]="esEntrada(movimiento.tipo)" [class.monto-salida]="!esEntrada(movimiento.tipo)">{{ montoConSigno(movimiento) }}</td>
+              <td class="derecha num">{{ moneda(movimiento.saldoPosterior) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-paginador [total]="filtrados().length" [tamano]="15" [(pagina)]="pagina" />
   }
 </section>

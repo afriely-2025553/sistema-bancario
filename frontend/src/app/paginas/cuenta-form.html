@@ -1,32 +1,63 @@
-<header class="encabezado">
+<header class="pagina-encabezado">
   <div>
-    <p class="sobre">Apertura</p>
-    <h2>Abrir cuenta</h2>
+    <nav class="migas" aria-label="Ruta"><a routerLink="/cuentas">Cuentas</a> / Nueva</nav>
+    <h1>Abrir cuenta</h1>
+    <p class="descripcion">La cuenta se abre con saldo Q 0.00 y el número se asigna al guardar.</p>
   </div>
-  <a class="boton secundario" routerLink="/cuentas">Volver</a>
 </header>
-<form class="tarjeta formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
-  @if (error()) { <p class="alerta error">{{ error() }}</p> }
-  <div class="campos">
-    <label>
-      Cliente activo
-      <select formControlName="clienteId">
-        <option value="">Seleccione</option>
-        @for (cliente of clientes(); track cliente.id) {
-          <option [value]="cliente.id">{{ cliente.codigo }} · {{ cliente.nombres }} {{ cliente.apellidos }}</option>
-        }
-      </select>
-    </label>
-    <label>
-      Tipo de cuenta
-      <select formControlName="tipoCuentaId">
-        <option value="">Seleccione</option>
-        @for (tipo of tipos(); track tipo.id) {
-          <option [value]="tipo.id">{{ tipo.nombre }}</option>
-        }
-      </select>
-    </label>
-  </div>
-  <p class="ayuda">El saldo inicial es Q 0.00 y el número lo asigna el sistema.</p>
-  <button class="boton" type="submit" [disabled]="enviando()">{{ enviando() ? 'Abriendo…' : 'Abrir cuenta' }}</button>
-</form>
+
+@if (cargando()) {
+  <div class="panel estado-carga" role="status"><span class="giro" aria-hidden="true"></span> Cargando clientes y tipos de cuenta…</div>
+} @else {
+  <form class="panel form-ancho" [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+    <div class="panel-cuerpo formulario">
+      @if (error()) { <p class="alerta error" role="alert">{{ error() }}</p> }
+      @if (clientes().length === 0 && !error()) {
+        <p class="alerta aviso"><span>No hay clientes activos. <a routerLink="/clientes/nuevo">Registre un cliente</a> antes de abrir una cuenta.</span></p>
+      }
+      <div class="campos">
+        <div class="campo">
+          <label for="cliente">Cliente titular</label>
+          <select id="cliente" formControlName="clienteId" [attr.aria-invalid]="!!errorCliente()" aria-describedby="cliente-ayuda">
+            <option value="">Seleccione un cliente</option>
+            @for (cliente of clientes(); track cliente.id) {
+              <option [value]="cliente.id">{{ nombreCliente(cliente) }} ({{ cliente.codigo }})</option>
+            }
+          </select>
+          @if (errorCliente()) {
+            <span id="cliente-ayuda" class="error-campo">{{ errorCliente() }}</span>
+          } @else {
+            <span id="cliente-ayuda" class="ayuda">Solo se listan clientes activos.</span>
+          }
+        </div>
+        <div class="campo">
+          <label for="tipo">Tipo de cuenta</label>
+          <select id="tipo" formControlName="tipoCuentaId" [attr.aria-invalid]="!!errorTipo()" aria-describedby="tipo-ayuda">
+            <option value="">Seleccione un tipo</option>
+            @for (tipo of tipos(); track tipo.id) {
+              <option [value]="tipo.id">{{ tipo.nombre }}</option>
+            }
+          </select>
+          @if (errorTipo()) {
+            <span id="tipo-ayuda" class="error-campo">{{ errorTipo() }}</span>
+          } @else if (tipoElegido(); as tipo) {
+            <span id="tipo-ayuda" class="ayuda">{{ tipo.descripcion }}</span>
+          }
+        </div>
+      </div>
+      @if (clienteElegido(); as cliente) {
+        <div class="resumen-cuenta">
+          <div><span>Titular</span><strong>{{ nombreCliente(cliente) }}</strong></div>
+          <div><span>Identificación</span><strong>{{ cliente.identificacion }}</strong></div>
+          <div><span>Saldo inicial</span><strong>Q 0.00</strong></div>
+        </div>
+      }
+      <div class="formulario-pie">
+        <a class="boton secundario" routerLink="/cuentas">Cancelar</a>
+        <button class="boton" type="submit" [disabled]="enviando() || clientes().length === 0">
+          @if (enviando()) { <span class="giro" aria-hidden="true"></span> Abriendo… } @else { Abrir cuenta }
+        </button>
+      </div>
+    </div>
+  </form>
+}

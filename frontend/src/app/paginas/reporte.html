@@ -1,48 +1,98 @@
-<header class="encabezado">
+<header class="pagina-encabezado">
   <div>
-    <p class="sobre">Resumen</p>
-    <h2>Reporte de operaciones</h2>
+    <h1>Reporte de operaciones</h1>
+    <p class="descripcion">{{ periodo() }}</p>
+  </div>
+  <div class="grupo-acciones no-imprimir">
+    <button type="button" class="boton secundario" (click)="imprimir()" [disabled]="cargando() || !reporte()">Imprimir</button>
   </div>
 </header>
-<form class="filtros" [formGroup]="filtros" (ngSubmit)="cargar()">
-  <label>Desde <input type="date" formControlName="desde" /></label>
-  <label>Hasta <input type="date" formControlName="hasta" /></label>
-  <button class="boton secundario" type="submit">Aplicar periodo</button>
-</form>
-@if (error()) { <p class="alerta error">{{ error() }}</p> }
-@if (reporte(); as datos) {
-  <div class="rejilla-kpis">
-    <article><span>Depósitos</span><strong>{{ moneda(datos.depositos.monto) }}</strong><small>{{ datos.depositos.cantidad }} operaciones</small></article>
-    <article><span>Retiros</span><strong>{{ moneda(datos.retiros.monto) }}</strong><small>{{ datos.retiros.cantidad }} operaciones</small></article>
-    <article><span>Transferencias</span><strong>{{ moneda(datos.transferencias.monto) }}</strong><small>{{ datos.transferencias.cantidad }} operaciones</small></article>
-    <article><span>Saldo en cuentas</span><strong>{{ moneda(datos.cuentas.saldoTotal) }}</strong><small>{{ datos.cuentas.activas }} activas · {{ datos.cuentas.inactivas }} inactivas</small></article>
+
+<section class="panel no-imprimir">
+  <form class="filtros" [formGroup]="filtros" (ngSubmit)="cargar()" novalidate>
+    <div class="campo">
+      <label for="rep-desde">Desde</label>
+      <input id="rep-desde" type="date" formControlName="desde" [max]="hoy" [attr.aria-invalid]="!!errorFechas()" aria-describedby="rep-fechas-error" />
+    </div>
+    <div class="campo">
+      <label for="rep-hasta">Hasta</label>
+      <input id="rep-hasta" type="date" formControlName="hasta" [max]="hoy" [attr.aria-invalid]="!!errorFechas()" aria-describedby="rep-fechas-error" />
+    </div>
+    <div class="grupo-acciones">
+      <button class="boton" type="submit">Aplicar periodo</button>
+      <button class="boton secundario" type="button" (click)="rapido('mes')">Mes actual</button>
+      <button class="boton secundario" type="button" (click)="rapido('todo')">Todo el historial</button>
+    </div>
+    @if (errorFechas()) { <span id="rep-fechas-error" class="error-campo">{{ errorFechas() }}</span> }
+  </form>
+</section>
+
+@if (cargando()) {
+  <div class="panel estado-carga" role="status"><span class="giro" aria-hidden="true"></span> Generando reporte…</div>
+} @else if (error()) {
+  <div class="alerta error" role="alert">
+    <span>{{ error() }}</span>
+    <button type="button" class="boton secundario pequeno" (click)="cargar()">Reintentar</button>
   </div>
-  <section class="tarjeta">
-    <h3>Clientes</h3>
-    <p>{{ datos.clientes.activos }} activos y {{ datos.clientes.inactivos }} desactivados. La baja es lógica: la ficha y los movimientos permanecen.</p>
-  </section>
-  <section class="tarjeta">
-    <h3>Detalle del periodo</h3>
+} @else if (reporte(); as datos) {
+  <div class="rejilla cuatro">
+    <article class="panel indicador">
+      <span class="indicador-etiqueta">Depósitos</span>
+      <span class="indicador-valor">{{ moneda(datos.depositos.monto) }}</span>
+      <span class="indicador-nota">{{ plural(datos.depositos.cantidad, 'operación', 'operaciones') }}</span>
+    </article>
+    <article class="panel indicador">
+      <span class="indicador-etiqueta">Retiros</span>
+      <span class="indicador-valor">{{ moneda(datos.retiros.monto) }}</span>
+      <span class="indicador-nota">{{ plural(datos.retiros.cantidad, 'operación', 'operaciones') }}</span>
+    </article>
+    <article class="panel indicador">
+      <span class="indicador-etiqueta">Transferencias</span>
+      <span class="indicador-valor">{{ moneda(datos.transferencias.monto) }}</span>
+      <span class="indicador-nota">{{ plural(datos.transferencias.cantidad, 'operación', 'operaciones') }}</span>
+    </article>
+    <article class="panel indicador">
+      <span class="indicador-etiqueta">Saldo actual en cuentas</span>
+      <span class="indicador-valor">{{ moneda(datos.cuentas.saldoTotal) }}</span>
+      <span class="indicador-nota">{{ plural(datos.cuentas.activas, 'activa', 'activas') }} · {{ plural(datos.cuentas.inactivas, 'inactiva', 'inactivas') }}</span>
+    </article>
+  </div>
+
+  <section class="panel">
+    <div class="panel-cabecera">
+      <h2>Detalle del periodo</h2>
+      <span class="suave">Clientes: {{ plural(datos.clientes.activos, 'activo', 'activos') }} y {{ plural(datos.clientes.inactivos, 'inactivo', 'inactivos') }}</span>
+    </div>
     @if (movimientos().length === 0) {
-      <p class="vacio">No hay operaciones en el periodo.</p>
+      <div class="estado-vacio">
+        <strong>Sin operaciones en el periodo</strong>
+        <span>Amplíe el rango de fechas o elija «Todo el historial».</span>
+      </div>
     } @else {
-      <table>
-        <thead>
-          <tr><th>Fecha</th><th>Cuenta</th><th>Tipo</th><th>Monto</th><th>Saldo posterior</th><th>Descripción</th></tr>
-        </thead>
-        <tbody>
-          @for (movimiento of movimientos(); track movimiento.id) {
+      <div class="tabla-contenedor">
+        <table>
+          <thead>
             <tr>
-              <td>{{ fecha(movimiento.fecha) }}</td>
-              <td>{{ movimiento.numeroCuenta }}</td>
-              <td>{{ etiquetaTipo(movimiento.tipo) }}</td>
-              <td>{{ moneda(movimiento.monto) }}</td>
-              <td>{{ moneda(movimiento.saldoPosterior) }}</td>
-              <td>{{ movimiento.descripcion }}</td>
+              <th scope="col">Fecha</th><th scope="col">Cuenta</th><th scope="col">Tipo</th><th scope="col">Descripción</th>
+              <th scope="col" class="derecha">Monto</th><th scope="col" class="derecha">Saldo</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (movimiento of visibles(); track movimiento.id) {
+              <tr>
+                <td class="num">{{ fecha(movimiento.fecha) }}</td>
+                <td class="num"><a [routerLink]="['/cuentas', movimiento.cuentaId]">{{ movimiento.numeroCuenta }}</a></td>
+                <td>{{ etiquetaTipo(movimiento.tipo) }}</td>
+                <td>{{ movimiento.descripcion || '—' }}</td>
+                <td class="derecha num" [class.monto-entrada]="esEntrada(movimiento.tipo)" [class.monto-salida]="!esEntrada(movimiento.tipo)">{{ montoConSigno(movimiento) }}</td>
+                <td class="derecha num">{{ moneda(movimiento.saldoPosterior) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-paginador class="no-imprimir" [total]="movimientos().length" [tamano]="15" [(pagina)]="pagina" />
     }
   </section>
+  <p class="ayuda pie-reporte">Generado el {{ generado() }}.</p>
 }

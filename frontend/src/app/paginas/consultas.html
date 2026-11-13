@@ -1,45 +1,100 @@
-<header class="encabezado">
+<header class="pagina-encabezado">
   <div>
-    <p class="sobre">Búsqueda</p>
-    <h2>Consultas</h2>
+    <h1>Consultas</h1>
+    <p class="descripcion">Localice clientes y cuentas, y verifique saldos y estados.</p>
   </div>
 </header>
-<form class="filtros" [formGroup]="formulario" (ngSubmit)="buscar()">
-  <input formControlName="q" placeholder="Identificación, nombre, correo o número de cuenta" />
-  <button class="boton" type="submit">Consultar</button>
-</form>
-@if (error()) { <p class="alerta error">{{ error() }}</p> }
-@if (resultado(); as datos) {
-  <div class="dos-columnas">
-    <section class="tarjeta">
-      <h3>Clientes ({{ datos.clientes.length }})</h3>
-      @if (datos.clientes.length === 0) {
-        <p class="vacio">Sin clientes.</p>
-      } @else {
-        <ul class="lista">
-          @for (cliente of datos.clientes; track cliente.id) {
-            <li>
-              <a [routerLink]="['/clientes', cliente.id]">{{ cliente.codigo }} · {{ cliente.nombres }} {{ cliente.apellidos }}</a>
-              <small>{{ cliente.identificacion }} · {{ cliente.correo }}</small>
-            </li>
-          }
-        </ul>
-      }
+
+<section class="panel">
+  <form class="filtros" [formGroup]="formulario" (ngSubmit)="buscar()" role="search" novalidate>
+    <div class="campo crece">
+      <label for="consulta">Buscar por nombre, código de cliente, identificación, correo o número de cuenta</label>
+      <input id="consulta" type="search" formControlName="q" placeholder="Por ejemplo: López o 100-00000002"
+             [attr.aria-invalid]="!!errorTexto()" aria-describedby="consulta-error" />
+    </div>
+    <div class="grupo-acciones">
+      <button class="boton" type="submit" [disabled]="cargando()">Buscar</button>
+      @if (resultado()) { <button class="boton secundario" type="button" (click)="limpiar()">Limpiar</button> }
+    </div>
+    @if (errorTexto()) { <span id="consulta-error" class="error-campo">{{ errorTexto() }}</span> }
+  </form>
+
+  @if (cargando()) {
+    <div class="estado-carga" role="status"><span class="giro" aria-hidden="true"></span> Buscando…</div>
+  } @else if (error()) {
+    <div class="panel-cuerpo"><p class="alerta error" role="alert">{{ error() }}</p></div>
+  } @else if (!resultado()) {
+    <div class="estado-vacio">
+      <strong>Escriba un criterio para comenzar</strong>
+      <span>La búsqueda revisa clientes y cuentas a la vez. También acepta parte de un nombre o de un número.</span>
+      <div class="sugerencias" aria-label="Ejemplos de búsqueda">
+        @for (ejemplo of ejemplos; track ejemplo) {
+          <button type="button" (click)="usarEjemplo(ejemplo)">{{ ejemplo }}</button>
+        }
+      </div>
+    </div>
+  } @else if (resultado(); as datos) {
+    @if (datos.clientes.length === 0 && datos.cuentas.length === 0) {
+      <div class="estado-vacio">
+        <strong>Sin resultados para «{{ datos.criterio }}»</strong>
+        <span>Revise la ortografía o busque con menos caracteres, por ejemplo solo el apellido.</span>
+      </div>
+    } @else {
+      <p class="resumen-busqueda suave" role="status">
+        {{ datos.clientes.length }} {{ datos.clientes.length === 1 ? 'cliente' : 'clientes' }} y
+        {{ datos.cuentas.length }} {{ datos.cuentas.length === 1 ? 'cuenta' : 'cuentas' }} para «{{ datos.criterio }}».
+      </p>
+    }
+  }
+</section>
+
+@if (!cargando() && resultado(); as datos) {
+  @if (datos.clientes.length > 0) {
+    <section class="panel">
+      <div class="panel-cabecera"><h2>Clientes ({{ datos.clientes.length }})</h2></div>
+      <div class="tabla-contenedor">
+        <table>
+          <thead>
+            <tr><th scope="col">Cliente</th><th scope="col">Identificación</th><th scope="col">Correo</th><th scope="col">Estado</th></tr>
+          </thead>
+          <tbody>
+            @for (cliente of datos.clientes; track cliente.id) {
+              <tr>
+                <td>
+                  <a class="celda-principal" [routerLink]="['/clientes', cliente.id]">{{ nombreCliente(cliente) }}</a>
+                  <span class="celda-secundaria">{{ cliente.codigo }}</span>
+                </td>
+                <td class="num">{{ cliente.identificacion }}</td>
+                <td>{{ cliente.correo }}</td>
+                <td><span class="etiqueta-estado" [class.inactivo]="!cliente.activo">{{ cliente.activo ? 'Activo' : 'Inactivo' }}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </section>
-    <section class="tarjeta">
-      <h3>Cuentas ({{ datos.cuentas.length }})</h3>
-      @if (datos.cuentas.length === 0) {
-        <p class="vacio">Sin cuentas.</p>
-      } @else {
-        <ul class="lista">
-          @for (cuenta of datos.cuentas; track cuenta.id) {
-            <li>
-              <a [routerLink]="['/cuentas', cuenta.id]">{{ cuenta.numeroCuenta }} · {{ moneda(cuenta.saldo) }}</a>
-              <small>{{ cuenta.clienteNombre }} · {{ cuenta.estado }}</small>
-            </li>
-          }
-        </ul>
-      }
+  }
+  @if (datos.cuentas.length > 0) {
+    <section class="panel">
+      <div class="panel-cabecera"><h2>Cuentas ({{ datos.cuentas.length }})</h2></div>
+      <div class="tabla-contenedor">
+        <table>
+          <thead>
+            <tr><th scope="col">Número</th><th scope="col">Titular</th><th scope="col">Tipo</th><th scope="col">Estado</th><th scope="col" class="derecha">Saldo</th></tr>
+          </thead>
+          <tbody>
+            @for (cuenta of datos.cuentas; track cuenta.id) {
+              <tr>
+                <td class="num"><a class="celda-principal" [routerLink]="['/cuentas', cuenta.id]">{{ cuenta.numeroCuenta }}</a></td>
+                <td>{{ cuenta.clienteNombre }}<span class="celda-secundaria">{{ cuenta.clienteCodigo }}</span></td>
+                <td>{{ cuenta.tipoCuenta }}</td>
+                <td><span class="etiqueta-estado" [class.inactivo]="cuenta.estado !== 'activa'">{{ cuenta.estado === 'activa' ? 'Activa' : 'Inactiva' }}</span></td>
+                <td class="derecha num">{{ moneda(cuenta.saldo) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </section>
-  </div>
+  }
 }

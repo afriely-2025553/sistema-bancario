@@ -1,49 +1,100 @@
-<a class="volver" routerLink="/cuentas">Volver a cuentas</a>
-@if (error()) { <p class="alerta error">{{ error() }}</p> }
-@if (mensaje()) { <p class="alerta ok">{{ mensaje() }}</p> }
-@if (cuenta(); as actual) {
-  <header class="encabezado">
-    <div>
-      <p class="sobre">{{ actual.numeroCuenta }}</p>
-      <h2>{{ moneda(actual.saldo) }}</h2>
-      <p>{{ actual.clienteCodigo }} · {{ actual.clienteNombre }} · {{ actual.tipoCuenta }}</p>
+@if (cargando()) {
+  <div class="panel estado-carga" role="status"><span class="giro" aria-hidden="true"></span> Cargando cuenta…</div>
+} @else if (error()) {
+  <div class="pila">
+    <nav class="migas" aria-label="Ruta"><a routerLink="/cuentas">Cuentas</a></nav>
+    <div class="alerta error" role="alert">
+      <span>{{ error() }}</span>
+      <button type="button" class="boton secundario pequeno" (click)="cargar()">Reintentar</button>
     </div>
-    <a class="boton" [routerLink]="['/operaciones']" [queryParams]="{ cuentaId: actual.id }">Operar</a>
+  </div>
+} @else if (cuenta(); as actual) {
+  <header class="pagina-encabezado">
+    <div>
+      <nav class="migas" aria-label="Ruta"><a routerLink="/cuentas">Cuentas</a> / {{ actual.numeroCuenta }}</nav>
+      <h1 class="num">Cuenta {{ actual.numeroCuenta }}</h1>
+      <p class="descripcion">
+        {{ actual.tipoCuenta }} ·
+        <span class="etiqueta-estado" [class.inactivo]="actual.estado !== 'activa'">{{ actual.estado === 'activa' ? 'Activa' : 'Inactiva' }}</span>
+      </p>
+    </div>
+    <div class="grupo-acciones">
+      <button type="button" class="boton" [class.peligro-borde]="actual.estado === 'activa'" [class.secundario]="actual.estado !== 'activa'"
+              [disabled]="procesando()" (click)="cambiarEstado()">
+        {{ actual.estado === 'activa' ? 'Desactivar cuenta' : 'Activar cuenta' }}
+      </button>
+    </div>
   </header>
-  <form class="tarjeta fila-estado" [formGroup]="estado" (ngSubmit)="guardarEstado()">
-    <label>
-      Estado de la cuenta
-      <select formControlName="valor">
-        <option value="activa">Activa</option>
-        <option value="inactiva">Inactiva</option>
-      </select>
-    </label>
-    <button class="boton secundario" type="submit">Actualizar estado</button>
-    @if (!actual.clienteActivo) {
-      <p class="ayuda">El cliente está desactivado: la cuenta no puede operar aunque figure activa.</p>
-    }
-  </form>
-  <section class="tarjeta">
-    <h3>Movimientos de la cuenta</h3>
+
+  @if (!actual.clienteActivo) {
+    <p class="alerta aviso"><span>El titular está inactivo, por lo que la cuenta no puede operar. Para habilitarla, active al cliente desde su <a [routerLink]="['/clientes', actual.clienteId]">ficha</a>.</span></p>
+  } @else if (actual.estado !== 'activa') {
+    <p class="alerta aviso">La cuenta está inactiva y no admite operaciones.</p>
+  }
+
+  <div class="rejilla tres">
+    <article class="panel indicador">
+      <span class="indicador-etiqueta">Saldo disponible</span>
+      <span class="indicador-valor">{{ moneda(actual.saldo) }}</span>
+    </article>
+    <article class="panel indicador">
+      <span class="indicador-etiqueta">Titular</span>
+      <a class="celda-principal" [routerLink]="['/clientes', actual.clienteId]">{{ actual.clienteNombre }}</a>
+      <span class="indicador-nota">{{ actual.clienteCodigo }}</span>
+    </article>
+    <article class="panel indicador">
+      <span class="indicador-etiqueta">Fecha de apertura</span>
+      <span>{{ soloFecha(actual.fechaApertura) }}</span>
+      <span class="indicador-nota">{{ plural(movimientos().length, 'movimiento', 'movimientos') }}</span>
+    </article>
+  </div>
+
+  @if (operable(actual)) {
+    <div class="grupo-acciones acciones-cuenta">
+      <a class="boton" routerLink="/operaciones" [queryParams]="{ tipo: 'deposito', cuentaId: actual.id }">Depositar</a>
+      <a class="boton secundario" routerLink="/operaciones" [queryParams]="{ tipo: 'retiro', cuentaId: actual.id }">Retirar</a>
+      <a class="boton secundario" routerLink="/operaciones" [queryParams]="{ tipo: 'transferencia', cuentaId: actual.id }">Transferir</a>
+    </div>
+  }
+
+  <section class="panel">
+    <div class="panel-cabecera">
+      <h2>Movimientos</h2>
+      @if (movimientos().length > 0) { <a routerLink="/movimientos" [queryParams]="{ cuentaId: actual.id }">Filtrar por fechas</a> }
+    </div>
     @if (movimientos().length === 0) {
-      <p class="vacio">Esta cuenta todavía no tiene movimientos.</p>
+      <div class="estado-vacio">
+        <strong>Sin movimientos</strong>
+        <span>Esta cuenta todavía no registra operaciones.</span>
+      </div>
     } @else {
-      <table>
-        <thead>
-          <tr><th>Fecha</th><th>Tipo</th><th>Monto</th><th>Saldo posterior</th><th>Detalle</th></tr>
-        </thead>
-        <tbody>
-          @for (movimiento of movimientos(); track movimiento.id) {
+      <div class="tabla-contenedor">
+        <table>
+          <thead>
             <tr>
-              <td>{{ fecha(movimiento.fecha) }}</td>
-              <td>{{ etiquetaTipo(movimiento.tipo) }}</td>
-              <td>{{ moneda(movimiento.monto) }}</td>
-              <td>{{ moneda(movimiento.saldoPosterior) }}</td>
-              <td>{{ movimiento.descripcion }} {{ movimiento.cuentaContraparte ? '· ' + movimiento.cuentaContraparte : '' }}</td>
+              <th scope="col">Fecha</th><th scope="col">Tipo</th><th scope="col">Descripción</th>
+              <th scope="col" class="derecha">Monto</th><th scope="col" class="derecha">Saldo</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (movimiento of visibles(); track movimiento.id) {
+              <tr>
+                <td class="num">{{ fecha(movimiento.fecha) }}</td>
+                <td>{{ etiquetaTipo(movimiento.tipo) }}</td>
+                <td>
+                  {{ movimiento.descripcion || '—' }}
+                  @if (movimiento.cuentaContraparte) {
+                    <span class="celda-secundaria">{{ movimiento.tipo === 'transferencia_salida' ? 'Hacia' : 'Desde' }} {{ movimiento.cuentaContraparte }}</span>
+                  }
+                </td>
+                <td class="derecha num" [class.monto-entrada]="esEntrada(movimiento.tipo)" [class.monto-salida]="!esEntrada(movimiento.tipo)">{{ montoConSigno(movimiento) }}</td>
+                <td class="derecha num">{{ moneda(movimiento.saldoPosterior) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-paginador [total]="movimientos().length" [(pagina)]="pagina" />
     }
   </section>
 }
