@@ -1,0 +1,47 @@
+<header class="encabezado">
+  <div>
+    <p class="sobre">Resumen</p>
+    <h2>Reporte de operaciones</h2>
+  </div>
+</header>
+<form class="filtros" [formGroup]="filtros" (ngSubmit)="cargar()">
+  <label>Desde <input type="date" formControlName="desde" /></label>
+  <label>Hasta <input type="date" formControlName="hasta" /></label>
+  <button class="boton secundario" type="submit">Aplicar periodo</button>
+</form>
+@if (error()) { <p class="alerta error">{{ error() }}</p> }
+@if (reporte(); as datos) {
+  <div class="rejilla-kpis">
+    <article><span>Depósitos</span><strong>{{ moneda(datos.depositos.monto) }}</strong><small>{{ datos.depositos.cantidad }} operaciones</small></article>
+    <article><span>Retiros</span><strong>{{ moneda(datos.retiros.monto) }}</strong><small>{{ datos.retiros.cantidad }} operaciones</small></article>
+    <article><span>Transferencias</span><strong>{{ moneda(datos.transferencias.monto) }}</strong><small>{{ datos.transferencias.cantidad }} operaciones</small></article>
+    <article><span>Saldo en cuentas</span><strong>{{ moneda(datos.cuentas.saldoTotal) }}</strong><small>{{ datos.cuentas.activas }} activas · {{ datos.cuentas.inactivas }} inactivas</small></article>
+  </div>
+  <section class="tarjeta">
+    <h3>Clientes</h3>
+    <p>{{ datos.clientes.activos }} activos y {{ datos.clientes.inactivos }} desactivados. La baja es lógica: la ficha y los movimientos permanecen.</p>
+  </section>
+  <section class="tarjeta">
+    <h3>Detalle del periodo</h3>
+    @if (datos.ultimasOperaciones.length === 0) {
+      <p class="vacio">No hay operaciones en el periodo.</p>
+    } @else {
+      <table>
+        <thead>
+          <tr><th>Fecha</th><th>Cuenta</th><th>Tipo</th><th>Monto</th><th>Descripción</th></tr>
+        </thead>
+        <tbody>
+          @for (movimiento of datos.ultimasOperaciones; track movimiento.id) {
+            <tr>
+              <td>{{ fecha(movimiento.fecha) }}</td>
+              <td>{{ movimiento.numeroCuenta }}</td>
+              <td>{{ etiquetaTipo(movimiento.tipo) }}</td>
+              <td>{{ moneda(movimiento.monto) }}</td>
+              <td>{{ movimiento.descripcion }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+}

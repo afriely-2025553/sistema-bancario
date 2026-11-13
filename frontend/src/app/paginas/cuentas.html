@@ -1,0 +1,42 @@
+<header class="encabezado">
+  <div>
+    <p class="sobre">Productos</p>
+    <h2>Cuentas</h2>
+  </div>
+  <a class="boton" routerLink="/cuentas/nueva">Abrir cuenta</a>
+</header>
+<form class="filtros" [formGroup]="busqueda" (ngSubmit)="cargar()">
+  <input formControlName="q" placeholder="Número, código o nombre del cliente" />
+  <button class="boton secundario" type="submit">Buscar</button>
+</form>
+@if (error()) { <p class="alerta error">{{ error() }}</p> }
+<section class="tarjeta">
+  @if (cuentas().length === 0) {
+    <p class="vacio">No hay cuentas con ese criterio.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Número</th>
+          <th>Cliente</th>
+          <th>Tipo</th>
+          <th>Saldo</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (cuenta of cuentas(); track cuenta.id) {
+          <tr>
+            <td>{{ cuenta.numeroCuenta }}</td>
+            <td>{{ cuenta.clienteCodigo }} · {{ cuenta.clienteNombre }}</td>
+            <td>{{ cuenta.tipoCuenta }}</td>
+            <td>{{ moneda(cuenta.saldo) }}</td>
+            <td><span class="pildora" [class.off]="cuenta.estado !== 'activa'">{{ cuenta.estado === 'activa' ? 'Activa' : 'Inactiva' }}</span></td>
+            <td class="acciones"><a [routerLink]="['/cuentas', cuenta.id]">Ver</a></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

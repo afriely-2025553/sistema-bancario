@@ -1,0 +1,44 @@
+<header class="encabezado">
+  <div>
+    <p class="sobre">Historial</p>
+    <h2>Movimientos</h2>
+  </div>
+</header>
+<form class="filtros" [formGroup]="filtros" (ngSubmit)="cargar()">
+  <select formControlName="cuentaId">
+    <option value="">Todas las cuentas</option>
+    @for (cuenta of cuentas(); track cuenta.id) {
+      <option [value]="cuenta.id">{{ cuenta.numeroCuenta }}</option>
+    }
+  </select>
+  <input type="date" formControlName="desde" />
+  <input type="date" formControlName="hasta" />
+  <button class="boton secundario" type="submit">Filtrar</button>
+</form>
+@if (error()) { <p class="alerta error">{{ error() }}</p> }
+<section class="tarjeta">
+  @if (movimientos().length === 0) {
+    <p class="vacio">No hay movimientos para el filtro.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th><th>Cuenta</th><th>Tipo</th><th>Monto</th><th>Saldo posterior</th><th>Contraparte</th><th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (movimiento of movimientos(); track movimiento.id) {
+          <tr>
+            <td>{{ fecha(movimiento.fecha) }}</td>
+            <td>{{ movimiento.numeroCuenta }}</td>
+            <td>{{ etiquetaTipo(movimiento.tipo) }}</td>
+            <td>{{ moneda(movimiento.monto) }}</td>
+            <td>{{ moneda(movimiento.saldoPosterior) }}</td>
+            <td>{{ movimiento.cuentaContraparte || '—' }}</td>
+            <td>{{ movimiento.descripcion }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

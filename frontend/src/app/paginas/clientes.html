@@ -1,0 +1,50 @@
+<header class="encabezado">
+  <div>
+    <p class="sobre">Fichas</p>
+    <h2>Clientes</h2>
+  </div>
+  <a class="boton" routerLink="/clientes/nuevo">Registrar cliente</a>
+</header>
+<form class="filtros" [formGroup]="busqueda" (ngSubmit)="cargar()">
+  <input formControlName="q" placeholder="Código, identificación, nombre o correo" />
+  <button class="boton secundario" type="submit">Buscar</button>
+</form>
+@if (mensaje()) { <p class="alerta ok">{{ mensaje() }}</p> }
+@if (error()) { <p class="alerta error">{{ error() }}</p> }
+<section class="tarjeta">
+  @if (clientes().length === 0) {
+    <p class="vacio">No hay clientes con ese criterio.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Identificación</th>
+          <th>Nombre</th>
+          <th>Correo</th>
+          <th>Estado</th>
+          <th>Registro</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (cliente of clientes(); track cliente.id) {
+          <tr>
+            <td>{{ cliente.codigo }}</td>
+            <td>{{ cliente.identificacion }}</td>
+            <td>{{ cliente.nombres }} {{ cliente.apellidos }}</td>
+            <td>{{ cliente.correo }}</td>
+            <td><span class="pildora" [class.off]="!cliente.activo">{{ cliente.activo ? 'Activo' : 'Inactivo' }}</span></td>
+            <td>{{ fecha(cliente.fechaRegistro) }}</td>
+            <td class="acciones">
+              <a [routerLink]="['/clientes', cliente.id]">Editar</a>
+              <button type="button" class="enlace" (click)="cambiarActivo(cliente)">
+                {{ cliente.activo ? 'Desactivar' : 'Activar' }}
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

@@ -1,0 +1,28 @@
+<div class="shell">
+  <aside class="barra">
+    <div class="marca">
+      <span class="marca-sello">BA</span>
+      <div>
+        <strong>Banco de aula</strong>
+        <small>Datos ficticios</small>
+      </div>
+    </div>
+    <nav>
+      <a routerLink="/inicio" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
+      <a routerLink="/clientes" routerLinkActive="activo">Clientes</a>
+      <a routerLink="/cuentas" routerLinkActive="activo">Cuentas</a>
+      <a routerLink="/operaciones" routerLinkActive="activo">Operaciones</a>
+      <a routerLink="/movimientos" routerLinkActive="activo">Movimientos</a>
+      <a routerLink="/consultas" routerLinkActive="activo">Consultas</a>
+      <a routerLink="/reporte" routerLinkActive="activo">Reporte</a>
+    </nav>
+    <div class="sesion">
+      <p>{{ auth.usuario()?.nombreCompleto }}</p>
+      <small>{{ etiquetaRol(auth.usuario()?.rol || 'cajero') }} · {{ auth.usuario()?.nombreUsuario }}</small>
+      <button type="button" class="boton secundario" (click)="salir()">Cerrar sesión</button>
+    </div>
+  </aside>
+  <section class="contenido">
+    <router-outlet />
+  </section>
+</div>

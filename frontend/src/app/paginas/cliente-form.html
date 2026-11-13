@@ -1,0 +1,43 @@
+<header class="encabezado">
+  <div>
+    <p class="sobre">Ficha</p>
+    <h2>{{ id() ? 'Modificar cliente' : 'Registrar cliente' }}</h2>
+  </div>
+  <a class="boton secundario" routerLink="/clientes">Volver</a>
+</header>
+<form class="tarjeta formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+  @if (error()) { <p class="alerta error">{{ error() }}</p> }
+  <div class="campos">
+    <label>
+      Identificación ficticia
+      <input formControlName="identificacion" placeholder="DPI-FICT-1002999" />
+    </label>
+    <label>
+      Correo
+      <input type="email" formControlName="correo" placeholder="cliente@correo-ficticio.test" />
+    </label>
+    <label>
+      Nombres
+      <input formControlName="nombres" />
+    </label>
+    <label>
+      Apellidos
+      <input formControlName="apellidos" />
+    </label>
+    <label>
+      Fecha de nacimiento
+      <input type="date" formControlName="fechaNacimiento" />
+    </label>
+    <label>
+      Teléfono
+      <input formControlName="telefono" />
+    </label>
+    <label class="ancho">
+      Dirección
+      <input formControlName="direccion" />
+    </label>
+  </div>
+  <button class="boton" type="submit" [disabled]="enviando()">
+    {{ enviando() ? 'Guardando…' : 'Guardar' }}
+  </button>
+</form>

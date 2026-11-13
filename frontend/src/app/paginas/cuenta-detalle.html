@@ -1,0 +1,49 @@
+<a class="volver" routerLink="/cuentas">Volver a cuentas</a>
+@if (error()) { <p class="alerta error">{{ error() }}</p> }
+@if (mensaje()) { <p class="alerta ok">{{ mensaje() }}</p> }
+@if (cuenta(); as actual) {
+  <header class="encabezado">
+    <div>
+      <p class="sobre">{{ actual.numeroCuenta }}</p>
+      <h2>{{ moneda(actual.saldo) }}</h2>
+      <p>{{ actual.clienteCodigo }} · {{ actual.clienteNombre }} · {{ actual.tipoCuenta }}</p>
+    </div>
+    <a class="boton" [routerLink]="['/operaciones']" [queryParams]="{ cuentaId: actual.id }">Operar</a>
+  </header>
+  <form class="tarjeta fila-estado" [formGroup]="estado" (ngSubmit)="guardarEstado()">
+    <label>
+      Estado de la cuenta
+      <select formControlName="valor">
+        <option value="activa">Activa</option>
+        <option value="inactiva">Inactiva</option>
+      </select>
+    </label>
+    <button class="boton secundario" type="submit">Actualizar estado</button>
+    @if (!actual.clienteActivo) {
+      <p class="ayuda">El cliente está desactivado: la cuenta no puede operar aunque figure activa.</p>
+    }
+  </form>
+  <section class="tarjeta">
+    <h3>Movimientos de la cuenta</h3>
+    @if (movimientos().length === 0) {
+      <p class="vacio">Esta cuenta todavía no tiene movimientos.</p>
+    } @else {
+      <table>
+        <thead>
+          <tr><th>Fecha</th><th>Tipo</th><th>Monto</th><th>Saldo posterior</th><th>Detalle</th></tr>
+        </thead>
+        <tbody>
+          @for (movimiento of movimientos(); track movimiento.id) {
+            <tr>
+              <td>{{ fecha(movimiento.fecha) }}</td>
+              <td>{{ etiquetaTipo(movimiento.tipo) }}</td>
+              <td>{{ moneda(movimiento.monto) }}</td>
+              <td>{{ moneda(movimiento.saldoPosterior) }}</td>
+              <td>{{ movimiento.descripcion }} {{ movimiento.cuentaContraparte ? '· ' + movimiento.cuentaContraparte : '' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+}

@@ -1,0 +1,45 @@
+<header class="encabezado">
+  <div>
+    <p class="sobre">Búsqueda</p>
+    <h2>Consultas</h2>
+  </div>
+</header>
+<form class="filtros" [formGroup]="formulario" (ngSubmit)="buscar()">
+  <input formControlName="q" placeholder="Identificación, nombre, correo o número de cuenta" />
+  <button class="boton" type="submit">Consultar</button>
+</form>
+@if (error()) { <p class="alerta error">{{ error() }}</p> }
+@if (resultado(); as datos) {
+  <div class="dos-columnas">
+    <section class="tarjeta">
+      <h3>Clientes ({{ datos.clientes.length }})</h3>
+      @if (datos.clientes.length === 0) {
+        <p class="vacio">Sin clientes.</p>
+      } @else {
+        <ul class="lista">
+          @for (cliente of datos.clientes; track cliente.id) {
+            <li>
+              <a [routerLink]="['/clientes', cliente.id]">{{ cliente.codigo }} · {{ cliente.nombres }} {{ cliente.apellidos }}</a>
+              <small>{{ cliente.identificacion }} · {{ cliente.correo }}</small>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+    <section class="tarjeta">
+      <h3>Cuentas ({{ datos.cuentas.length }})</h3>
+      @if (datos.cuentas.length === 0) {
+        <p class="vacio">Sin cuentas.</p>
+      } @else {
+        <ul class="lista">
+          @for (cuenta of datos.cuentas; track cuenta.id) {
+            <li>
+              <a [routerLink]="['/cuentas', cuenta.id]">{{ cuenta.numeroCuenta }} · {{ moneda(cuenta.saldo) }}</a>
+              <small>{{ cuenta.clienteNombre }} · {{ cuenta.estado }}</small>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+}

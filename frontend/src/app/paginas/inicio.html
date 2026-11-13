@@ -1,0 +1,67 @@
+<header class="encabezado">
+  <div>
+    <p class="sobre">Panel</p>
+    <h2>Resumen de la operación ficticia</h2>
+  </div>
+  <a class="boton" routerLink="/operaciones">Nueva operación</a>
+</header>
+@if (error()) {
+  <p class="alerta error">{{ error() }}</p>
+}
+@if (reporte(); as datos) {
+  <div class="rejilla-kpis">
+    <article>
+      <span>Clientes activos</span>
+      <strong>{{ datos.clientes.activos }}</strong>
+    </article>
+    <article>
+      <span>Cuentas activas</span>
+      <strong>{{ datos.cuentas.activas }}</strong>
+    </article>
+    <article>
+      <span>Saldo total</span>
+      <strong>{{ moneda(datos.cuentas.saldoTotal) }}</strong>
+    </article>
+    <article>
+      <span>Transferencias</span>
+      <strong>{{ datos.transferencias.cantidad }}</strong>
+    </article>
+  </div>
+  <div class="dos-columnas">
+    <section class="tarjeta">
+      <h3>Totales registrados</h3>
+      <table>
+        <thead>
+          <tr><th>Tipo</th><th>Cantidad</th><th>Monto</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Depósitos</td><td>{{ datos.depositos.cantidad }}</td><td>{{ moneda(datos.depositos.monto) }}</td></tr>
+          <tr><td>Retiros</td><td>{{ datos.retiros.cantidad }}</td><td>{{ moneda(datos.retiros.monto) }}</td></tr>
+          <tr><td>Transferencias</td><td>{{ datos.transferencias.cantidad }}</td><td>{{ moneda(datos.transferencias.monto) }}</td></tr>
+        </tbody>
+      </table>
+    </section>
+    <section class="tarjeta">
+      <h3>Últimos movimientos</h3>
+      @if (datos.ultimasOperaciones.length === 0) {
+        <p class="vacio">Todavía no hay movimientos.</p>
+      } @else {
+        <table>
+          <thead>
+            <tr><th>Fecha</th><th>Cuenta</th><th>Tipo</th><th>Monto</th></tr>
+          </thead>
+          <tbody>
+            @for (movimiento of datos.ultimasOperaciones; track movimiento.id) {
+              <tr>
+                <td>{{ fecha(movimiento.fecha) }}</td>
+                <td>{{ movimiento.numeroCuenta }}</td>
+                <td>{{ etiquetaTipo(movimiento.tipo) }}</td>
+                <td>{{ moneda(movimiento.monto) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </section>
+  </div>
+}
