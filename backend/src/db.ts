@@ -1,4 +1,4 @@
-import mysql, { Pool, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import mysql, { Pool, PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { configuracion } from './config';
 
 let pool: Pool | null = null;
@@ -33,6 +33,21 @@ export async function consultar<T extends RowDataPacket>(
 export async function ejecutar(sql: string, parametros: unknown[] = []): Promise<ResultSetHeader> {
   const [resultado] = await obtenerPool().query<ResultSetHeader>(sql, parametros);
   return resultado;
+}
+
+export async function enTransaccion<T>(trabajo: (conexion: PoolConnection) => Promise<T>): Promise<T> {
+  const conexion = await obtenerPool().getConnection();
+  try {
+    await conexion.beginTransaction();
+    const resultado = await trabajo(conexion);
+    await conexion.commit();
+    return resultado;
+  } catch (error) {
+    await conexion.rollback();
+    throw error;
+  } finally {
+    conexion.release();
+  }
 }
 
 export async function cerrarPool(): Promise<void> {

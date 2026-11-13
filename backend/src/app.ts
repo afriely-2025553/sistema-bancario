@@ -1,9 +1,11 @@
 import cors from 'cors';
 import express from 'express';
+import { exigirAuth, routerAuth } from './auth';
 import { routerClientes } from './clientes';
 import { consultar } from './db';
 import { manejadorErrores, envolver } from './http';
 import { routerCuentas, routerTiposCuenta } from './cuentas';
+import { routerDepositos, routerRetiros } from './operaciones';
 
 export function crearApp() {
   const app = express();
@@ -22,9 +24,12 @@ export function crearApp() {
     }),
   );
 
-  app.use('/api/clientes', routerClientes);
-  app.use('/api/cuentas', routerCuentas);
-  app.use('/api/tipos-cuenta', routerTiposCuenta);
+  app.use('/api/auth', routerAuth);
+  app.use('/api/clientes', exigirAuth, routerClientes);
+  app.use('/api/cuentas', exigirAuth, routerCuentas);
+  app.use('/api/tipos-cuenta', exigirAuth, routerTiposCuenta);
+  app.use('/api/depositos', exigirAuth, routerDepositos);
+  app.use('/api/retiros', exigirAuth, routerRetiros);
 
   app.use((_req, res) => {
     res.status(404).json({ mensaje: 'El recurso no existe.', codigo: 'NO_ENCONTRADO' });
