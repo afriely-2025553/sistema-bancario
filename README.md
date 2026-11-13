@@ -3,7 +3,7 @@
 [![CI](https://github.com/afriely-2025553/sistema-bancario/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/afriely-2025553/sistema-bancario/actions/workflows/ci.yml)
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/afriely-2025553/sistema-bancario?quickstart=1)
 
-Sistema de práctica para registrar clientes ficticios, abrir cuentas y operar depósitos, retiros y transferencias. Integra una interfaz en Angular, una API REST en Node.js y una base MySQL. No administra dinero real: las personas, los documentos, las contraseñas y los saldos de este repositorio son inventados.
+Sistema de práctica para registrar clientes, abrir cuentas y operar depósitos, retiros y transferencias. Integra una interfaz en Angular, una API REST en Node.js y una base MySQL. No administra dinero real: las personas, los documentos, las contraseñas y los saldos de este repositorio son inventados.
 
 | Dato | Valor |
 | --- | --- |
@@ -32,7 +32,7 @@ Se puede probar el sistema completo (MySQL, API y Angular) en GitHub Codespaces,
 1. Pulse el botón **Open in GitHub Codespaces** de arriba (o **Code → Codespaces → Create codespace on main**) con una cuenta de GitHub.
 2. Espere a que termine la preparación. La primera vez tarda unos minutos: instala dependencias, crea la base `banco_academico` y carga `schema.sql` y `seed.sql`.
 3. Al arrancar, la API y Angular se levantan solos en segundo plano. El navegador abre el puerto **4200 (Sistema bancario)**; si no se abre, vaya a la pestaña **PORTS** y abra la dirección del puerto 4200.
-4. Entre con `cajero` / `Cajero123!` (o `administrador` / `Admin123!`). Son credenciales ficticias.
+4. Entre con una de las cuentas de la sección [Credenciales ficticias de prueba](#credenciales-ficticias-de-prueba).
 5. Los registros quedan en `logs/backend.log` y `logs/frontend.log`. Para regresar a la semilla: `cd backend && npm run db:init`. Para las pruebas: `cd backend && npm test`.
 
 El frontend llama a la API por la ruta relativa `/api`, y el servidor de desarrollo de Angular la reenvía al backend del puerto 3000 (`frontend/proxy.conf.json`). Por eso basta con el puerto 4200.
@@ -54,7 +54,9 @@ Detenga el codespace cuando termine (**Codespaces → Stop codespace**) para no 
 9. Una cuenta inactiva, o la cuenta de un cliente inactivo, no opera.
 10. Solo se usan datos ficticios.
 
-## Credenciales ficticias
+## Credenciales ficticias de prueba
+
+La pantalla de acceso no muestra estas credenciales; solo se documentan aquí.
 
 | Usuario | Contraseña | Rol | Estado |
 | --- | --- | --- | --- |
@@ -62,7 +64,7 @@ Detenga el codespace cuando termine (**Codespaces → Stop codespace**) para no 
 | administrador | Admin123! | administrador | activo |
 | cajero.inactivo | Cajero123! | cajero | inactivo, para probar el rechazo |
 
-Base de datos de desarrollo, también ficticia:
+Base de datos de desarrollo:
 
 | Parámetro | Valor |
 | --- | --- |
@@ -71,6 +73,21 @@ Base de datos de desarrollo, también ficticia:
 | Base | banco_academico |
 | Usuario | banco_app |
 | Contraseña | BancoFicticio123! |
+
+## Pantallas
+
+| Ruta | Pantalla |
+| --- | --- |
+| /login | Acceso del operador |
+| /inicio | Indicadores, accesos directos y últimos movimientos |
+| /clientes | Lista con búsqueda, filtro por estado y paginación |
+| /clientes/nuevo, /clientes/:id/editar | Registro y edición del cliente |
+| /clientes/:id | Ficha del cliente con sus cuentas |
+| /cuentas, /cuentas/nueva, /cuentas/:id | Lista, apertura y detalle de cuentas |
+| /operaciones | Depósito, retiro y transferencia con confirmación y comprobante |
+| /movimientos | Historial con filtros por cuenta, tipo y fechas |
+| /consultas | Búsqueda de clientes y cuentas |
+| /reporte | Totales por periodo e impresión |
 
 ## Estructura
 
@@ -131,7 +148,7 @@ npm install
 npm start
 ```
 
-Abra `http://localhost:4200`. La pantalla de acceso recuerda las credenciales ficticias. `npm start` usa `proxy.conf.json`, que envía las llamadas a `/api` al backend en `http://127.0.0.1:3000`; por eso el backend debe estar en marcha antes de entrar.
+Abra `http://localhost:4200` y entre con las credenciales de prueba. `npm start` usa `proxy.conf.json`, que envía las llamadas a `/api` al backend en `http://127.0.0.1:3000`; por eso el backend debe estar en marcha antes de entrar.
 
 ### 4. Pruebas
 
@@ -184,7 +201,7 @@ La base es `http://localhost:3000/api`. Salvo el login y `/salud`, las rutas exi
 | GET | /consultas/saldo/:cuentaId | Saldo desde el módulo de consultas |
 | GET | /reportes/operaciones?desde=&hasta= | Totales y últimas operaciones |
 
-Los montos son números mayores que cero, con dos decimales como máximo, y no superan 1000000.00 en una sola operación de práctica. Un error de negocio responde 400 con `mensaje` y `codigo`. Un duplicado responde 409. Un recurso ausente responde 404.
+Los montos son números mayores que cero, con dos decimales como máximo, y no superan 1,000,000.00 en una sola operación. Un error de negocio responde 400 con `mensaje` y `codigo`. Un duplicado responde 409. Un recurso ausente responde 404.
 
 ## Documentación
 
