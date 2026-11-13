@@ -13,9 +13,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: unknown) => {
       const estado = (error as { status?: number }).status;
       const esLogin = req.url.includes('/auth/login');
-      if (estado === 401 && !esLogin) {
+      if (estado === 401 && !esLogin && auth.autenticado()) {
         auth.salir();
-        void router.navigateByUrl('/login');
+        void router.navigate(['/login'], { queryParams: { sesion: 'expirada' } });
       }
       return throwError(() => error);
     }),

@@ -93,32 +93,36 @@ export interface Consulta {
   cuentas: Cuenta[];
 }
 
-export function moneda(valor: number): string {
-  const texto = new Intl.NumberFormat('es-GT', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(valor);
-  return `Q ${texto}`;
+const FORMATO_MONEDA = new Intl.NumberFormat('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+/** Monto en quetzales con separador de miles y dos decimales: «Q 1,500.00». */
+export function moneda(valor: number | null | undefined): string {
+  return `Q\u00a0${FORMATO_MONEDA.format(Number(valor ?? 0))}`;
 }
 
-export function fecha(valor: string | null | undefined): string {
+/** Fecha «dd/mm/aaaa» u «dd/mm/aaaa hh:mm» (24 h) a partir de «AAAA-MM-DD[ HH:MM:SS]» o ISO. */
+export function fecha(valor: string | null | undefined, conHora = true): string {
   if (!valor) {
     return '—';
   }
-  if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
-    const [anio, mes, dia] = valor.split('-');
-    return `${dia}/${mes}/${anio}`;
-  }
-  const normalizada = valor.includes('T') ? valor : valor.replace(' ', 'T');
-  const instante = new Date(normalizada);
-  if (Number.isNaN(instante.getTime())) {
+  const partes = /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?/.exec(valor);
+  if (!partes) {
     return valor;
   }
-  const conHora = valor.length > 10;
-  return new Intl.DateTimeFormat('es-GT', {
-    dateStyle: 'medium',
-    timeStyle: conHora ? 'short' : undefined,
-  }).format(instante);
+  const [, anio, mes, dia, hora, minuto] = partes;
+  const base = `${dia}/${mes}/${anio}`;
+  return conHora && hora ? `${base} ${hora}:${minuto}` : base;
+}
+
+export function soloFecha(valor: string | null | undefined): string {
+  return fecha(valor, false);
+}
+
+export function hoyIso(): string {
+  const ahora = new Date();
+  const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+  const dia = String(ahora.getDate()).padStart(2, '0');
+  return `${ahora.getFullYear()}-${mes}-${dia}`;
 }
 
 export function etiquetaTipo(tipo: Movimiento['tipo']): string {
@@ -131,6 +135,41 @@ export function etiquetaTipo(tipo: Movimiento['tipo']): string {
   return etiquetas[tipo];
 }
 
+/** Depósitos y transferencias recibidas suman al saldo; retiros y enviadas restan. */
+export function esEntrada(tipo: Movimiento['tipo']): boolean {
+  return tipo === 'deposito' || tipo === 'transferencia_entrada';
+}
+
+export function montoConSigno(movimiento: Movimiento): string {
+  return `${esEntrada(movimiento.tipo) ? '+' : '−'}${moneda(movimiento.monto)}`;
+}
+
 export function etiquetaRol(rol: UsuarioSesion['rol']): string {
   return rol === 'administrador' ? 'Administrador' : 'Cajero';
+}
+
+export function nombreCliente(cliente: Pick<Cliente, 'nombres' | 'apellidos'>): string {
+  return `${cliente.nombres} ${cliente.apellidos}`;
+}
+
+export function operable(cuenta: Cuenta): boolean {
+  return cuenta.estado === 'activa' && cuenta.clienteActivo;
+}
+
+/** Minúsculas y sin tildes, para comparar búsquedas. */
+export function normalizar(texto: string): string {
+  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+/** Fecha y hora local actuales en formato «AAAA-MM-DD HH:MM». */
+export function ahoraLocal(): string {
+  const ahora = new Date();
+  const hora = String(ahora.getHours()).padStart(2, '0');
+  const minuto = String(ahora.getMinutes()).padStart(2, '0');
+  return `${hoyIso()} ${hora}:${minuto}`;
+}
+
+/** «1 operación», «3 operaciones». */
+export function plural(cantidad: number, singular: string, varios: string): string {
+  return `${cantidad} ${cantidad === 1 ? singular : varios}`;
 }

@@ -8,8 +8,8 @@ export function mensajeError(error: unknown): string {
     }
     // 0: el navegador no llegó a la API; 502-504: el proxy de Angular no encontró el backend.
     if (error.status === 0 || error.status === 502 || error.status === 503 || error.status === 504) {
-      return 'No hay conexión con la API. Compruebe que el backend esté en el puerto 3000.';
+      return 'No se pudo conectar con el servidor. Verifique que la API esté en ejecución e intente de nuevo.';
     }
   }
-  return 'No se pudo completar la operación.';
+  return 'No se pudo completar la operación. Intente de nuevo.';
 }
