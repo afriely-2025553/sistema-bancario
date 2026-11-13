@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { enTransaccion } from './db';
+import { consultar, enTransaccion } from './db';
 import { ErrorApp } from './errors';
 import { bandera, dinero, envolver } from './http';
 import { aCentavos, leerCuerpo, leerMonto } from './validacion';
@@ -167,8 +167,136 @@ async function aplicarSaldo(
   return leerMovimiento(conexion, movimientoId);
 }
 
+const esquemaTransferencia = z.object({
+  cuentaOrigenId: z
+    .number({ required_error: 'La cuenta origen es obligatoria.', invalid_type_error: 'La cuenta origen es obligatoria.' })
+    .int()
+    .positive('La cuenta origen es obligatoria.'),
+  cuentaDestinoId: z
+    .number({ required_error: 'La cuenta destino es obligatoria.', invalid_type_error: 'La cuenta destino es obligatoria.' })
+    .int()
+    .positive('La cuenta destino es obligatoria.'),
+  monto: z.unknown(),
+  concepto: z.union([z.string().trim().max(255, 'El concepto admite 255 caracteres.'), z.literal(''), z.null()]).optional(),
+});
+
+export interface TransferenciaDto {
+  id: number;
+  referencia: string;
+  cuentaOrigenId: number;
+  numeroCuentaOrigen: string;
+  cuentaDestinoId: number;
+  numeroCuentaDestino: string;
+  monto: number;
+  concepto: string | null;
+  fecha: string;
+  usuarioId: number | null;
+}
+
+export async function transferir(
+  origenId: number,
+  destinoId: number,
+  monto: string,
+  concepto: string | null,
+  usuarioId: number,
+): Promise<{ transferencia: TransferenciaDto; movimientoOrigen: MovimientoDto; movimientoDestino: MovimientoDto }> {
+  if (origenId === destinoId) {
+    throw new ErrorApp(400, 'No se puede transferir hacia la misma cuenta.', 'MISMA_CUENTA');
+  }
+  return enTransaccion(async (conexion) => {
+    const primero = Math.min(origenId, destinoId);
+    const segundo = Math.max(origenId, destinoId);
+    const bloqueadaA = await bloquearCuenta(conexion, primero);
+    const bloqueadaB = await bloquearCuenta(conexion, segundo);
+    const origen = bloqueadaA.id === origenId ? bloqueadaA : bloqueadaB;
+    const destino = bloqueadaA.id === destinoId ? bloqueadaA : bloqueadaB;
+    exigirOperable(origen);
+    exigirOperable(destino);
+    const anteriorOrigen = aCentavos(origen.saldo);
+    const anteriorDestino = aCentavos(destino.saldo);
+    const delta = aCentavos(monto);
+    if (anteriorOrigen < delta) {
+      throw new ErrorApp(400, 'La cuenta origen no tiene saldo suficiente.', 'SALDO_INSUFICIENTE');
+    }
+    const saldoOrigen = ((anteriorOrigen - delta) / 100).toFixed(2);
+    const saldoDestino = ((anteriorDestino + delta) / 100).toFixed(2);
+    await conexion.query('UPDATE cuenta SET saldo = ? WHERE id = ?', [saldoOrigen, origen.id]);
+    await conexion.query('UPDATE cuenta SET saldo = ? WHERE id = ?', [saldoDestino, destino.id]);
+    const temporal = `TMP${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`;
+    const [alta] = await conexion.query<ResultSetHeader>(
+      `INSERT INTO transferencia (
+         cuenta_origen_id, cuenta_destino_id, usuario_id, monto, referencia, concepto
+       ) VALUES (?, ?, ?, ?, ?, ?)`,
+      [origen.id, destino.id, usuarioId, monto, temporal, concepto],
+    );
+    const referencia = `TRF-${String(alta.insertId).padStart(8, '0')}`;
+    await conexion.query('UPDATE transferencia SET referencia = ? WHERE id = ?', [referencia, alta.insertId]);
+    const salidaId = await insertarMovimiento(conexion, {
+      cuentaId: origen.id,
+      transferenciaId: alta.insertId,
+      usuarioId,
+      tipo: 'transferencia_salida',
+      monto,
+      saldoAnterior: (anteriorOrigen / 100).toFixed(2),
+      saldoPosterior: saldoOrigen,
+      descripcion: concepto ? `Salida: ${concepto}` : `Salida por ${referencia}`,
+    });
+    const entradaId = await insertarMovimiento(conexion, {
+      cuentaId: destino.id,
+      transferenciaId: alta.insertId,
+      usuarioId,
+      tipo: 'transferencia_entrada',
+      monto,
+      saldoAnterior: (anteriorDestino / 100).toFixed(2),
+      saldoPosterior: saldoDestino,
+      descripcion: concepto ? `Entrada: ${concepto}` : `Entrada por ${referencia}`,
+    });
+    const [filas] = await conexion.query<RowDataPacket[]>(
+      `SELECT t.id, t.referencia, t.cuenta_origen_id, o.numero_cuenta AS numero_origen,
+              t.cuenta_destino_id, d.numero_cuenta AS numero_destino, t.monto, t.concepto,
+              t.fecha, t.usuario_id
+       FROM transferencia t
+       INNER JOIN cuenta o ON o.id = t.cuenta_origen_id
+       INNER JOIN cuenta d ON d.id = t.cuenta_destino_id
+       WHERE t.id = ?`,
+      [alta.insertId],
+    );
+    const fila = filas[0];
+    return {
+      transferencia: {
+        id: fila.id,
+        referencia: fila.referencia,
+        cuentaOrigenId: fila.cuenta_origen_id,
+        numeroCuentaOrigen: fila.numero_origen,
+        cuentaDestinoId: fila.cuenta_destino_id,
+        numeroCuentaDestino: fila.numero_destino,
+        monto: dinero(fila.monto),
+        concepto: fila.concepto,
+        fecha: fila.fecha,
+        usuarioId: fila.usuario_id,
+      },
+      movimientoOrigen: await leerMovimiento(conexion, salidaId),
+      movimientoDestino: await leerMovimiento(conexion, entradaId),
+    };
+  });
+}
+
+export async function operarCuenta(
+  cuentaId: number,
+  monto: string,
+  tipo: 'deposito' | 'retiro',
+  descripcion: string,
+  usuarioId: number,
+): Promise<MovimientoDto> {
+  return enTransaccion(async (conexion) => {
+    const cuenta = await bloquearCuenta(conexion, cuentaId);
+    return aplicarSaldo(conexion, cuenta, monto, tipo === 'deposito' ? 1 : -1, usuarioId, tipo, descripcion);
+  });
+}
+
 export const routerDepositos = Router();
 export const routerRetiros = Router();
+export const routerTransferencias = Router();
 
 routerDepositos.post(
   '/',
@@ -176,10 +304,7 @@ routerDepositos.post(
     const datos = leerCuerpo(esquemaOperacion, req.body);
     const monto = leerMonto(datos.monto);
     const descripcion = datos.descripcion ? datos.descripcion : 'Depósito en ventanilla';
-    const movimiento = await enTransaccion(async (conexion) => {
-      const cuenta = await bloquearCuenta(conexion, datos.cuentaId);
-      return aplicarSaldo(conexion, cuenta, monto, 1, req.usuario!.id, 'deposito', descripcion);
-    });
+    const movimiento = await operarCuenta(datos.cuentaId, monto, 'deposito', descripcion, req.usuario!.id);
     res.status(201).json({ movimiento });
   }),
 );
@@ -190,10 +315,48 @@ routerRetiros.post(
     const datos = leerCuerpo(esquemaOperacion, req.body);
     const monto = leerMonto(datos.monto);
     const descripcion = datos.descripcion ? datos.descripcion : 'Retiro en ventanilla';
-    const movimiento = await enTransaccion(async (conexion) => {
-      const cuenta = await bloquearCuenta(conexion, datos.cuentaId);
-      return aplicarSaldo(conexion, cuenta, monto, -1, req.usuario!.id, 'retiro', descripcion);
-    });
+    const movimiento = await operarCuenta(datos.cuentaId, monto, 'retiro', descripcion, req.usuario!.id);
     res.status(201).json({ movimiento });
+  }),
+);
+
+routerTransferencias.get(
+  '/',
+  envolver(async (_req, res) => {
+    const filas = await consultar<RowDataPacket>(
+      `SELECT t.id, t.referencia, t.cuenta_origen_id, o.numero_cuenta AS numero_origen,
+              t.cuenta_destino_id, d.numero_cuenta AS numero_destino, t.monto, t.concepto,
+              t.fecha, t.usuario_id
+       FROM transferencia t
+       INNER JOIN cuenta o ON o.id = t.cuenta_origen_id
+       INNER JOIN cuenta d ON d.id = t.cuenta_destino_id
+       ORDER BY t.fecha DESC, t.id DESC
+       LIMIT 200`,
+    );
+    res.json(
+      filas.map((fila) => ({
+        id: fila.id,
+        referencia: fila.referencia,
+        cuentaOrigenId: fila.cuenta_origen_id,
+        numeroCuentaOrigen: fila.numero_origen,
+        cuentaDestinoId: fila.cuenta_destino_id,
+        numeroCuentaDestino: fila.numero_destino,
+        monto: dinero(fila.monto),
+        concepto: fila.concepto,
+        fecha: fila.fecha,
+        usuarioId: fila.usuario_id,
+      })),
+    );
+  }),
+);
+
+routerTransferencias.post(
+  '/',
+  envolver(async (req, res) => {
+    const datos = leerCuerpo(esquemaTransferencia, req.body);
+    const monto = leerMonto(datos.monto);
+    const concepto = datos.concepto ? datos.concepto : null;
+    const resultado = await transferir(datos.cuentaOrigenId, datos.cuentaDestinoId, monto, concepto, req.usuario!.id);
+    res.status(201).json(resultado);
   }),
 );

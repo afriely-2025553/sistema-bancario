@@ -5,7 +5,10 @@ import { routerClientes } from './clientes';
 import { consultar } from './db';
 import { manejadorErrores, envolver } from './http';
 import { routerCuentas, routerTiposCuenta } from './cuentas';
-import { routerDepositos, routerRetiros } from './operaciones';
+import { routerConsultas } from './consultas';
+import { routerMovimientos } from './movimientos';
+import { routerDepositos, routerRetiros, routerTransferencias } from './operaciones';
+import { routerReportes } from './reportes';
 
 export function crearApp() {
   const app = express();
@@ -30,6 +33,10 @@ export function crearApp() {
   app.use('/api/tipos-cuenta', exigirAuth, routerTiposCuenta);
   app.use('/api/depositos', exigirAuth, routerDepositos);
   app.use('/api/retiros', exigirAuth, routerRetiros);
+  app.use('/api/transferencias', exigirAuth, routerTransferencias);
+  app.use('/api/movimientos', exigirAuth, routerMovimientos);
+  app.use('/api/consultas', exigirAuth, routerConsultas);
+  app.use('/api/reportes', exigirAuth, routerReportes);
 
   app.use((_req, res) => {
     res.status(404).json({ mensaje: 'El recurso no existe.', codigo: 'NO_ENCONTRADO' });

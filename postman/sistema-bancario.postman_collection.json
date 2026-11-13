@@ -1,0 +1,419 @@
+{
+  "info": {
+    "name": "Sistema bancario académico",
+    "description": "Colección de la API REST con datos ficticios. La carpeta Pruebas P001-P010 se ejecuta en orden. Identidad del repositorio: afriely-2025553.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api" },
+    { "key": "token", "value": "" },
+    { "key": "clienteId", "value": "" },
+    { "key": "cuentaId", "value": "" },
+    { "key": "cuentaDestinoId", "value": "" },
+    { "key": "saldoEsperado", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Pruebas P001-P010",
+      "item": [
+        {
+          "name": "P001 Login válido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const cuerpo = pm.response.json();",
+                  "pm.test('P001 permite el acceso', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(cuerpo.token).to.be.a('string').and.not.empty;",
+                  "  pm.expect(cuerpo.usuario.nombreUsuario).to.eql('cajero');",
+                  "});",
+                  "pm.collectionVariables.set('token', cuerpo.token);",
+                  "if (pm.environment.name) pm.environment.set('token', cuerpo.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"cajero\",\n  \"contrasena\": \"Cajero123!\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "P002 Login inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const cuerpo = pm.response.json();",
+                  "pm.test('P002 muestra error y no entrega token', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "  pm.expect(cuerpo.mensaje).to.be.a('string').and.not.empty;",
+                  "  pm.expect(cuerpo.token).to.be.undefined;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"cajero\",\n  \"contrasena\": \"clave-incorrecta\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "P003 Registrar cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const cuerpo = pm.response.json();",
+                  "pm.test('P003 almacena el cliente', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  pm.expect(cuerpo.id).to.be.above(0);",
+                  "  pm.expect(cuerpo.activo).to.eql(true);",
+                  "  pm.expect(cuerpo.codigo).to.match(/^CLI-/);",
+                  "});",
+                  "pm.collectionVariables.set('clienteId', String(cuerpo.id));",
+                  "if (pm.environment.name) pm.environment.set('clienteId', String(cuerpo.id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identificacion\": \"DPI-PM-{{$timestamp}}\",\n  \"nombres\": \"Cliente\",\n  \"apellidos\": \"Ficticio Postman\",\n  \"correo\": \"postman{{$timestamp}}@correo-ficticio.test\",\n  \"telefono\": \"55501999\",\n  \"direccion\": \"Calle de la coleccion\"\n}"
+            },
+            "url": "{{baseUrl}}/clientes"
+          }
+        },
+        {
+          "name": "P004 Crear cuenta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const cuerpo = pm.response.json();",
+                  "pm.test('P004 asocia la cuenta al cliente', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  pm.expect(cuerpo.clienteId).to.eql(Number(pm.collectionVariables.get('clienteId')));",
+                  "  pm.expect(cuerpo.saldo).to.eql(0);",
+                  "  pm.expect(cuerpo.estado).to.eql('activa');",
+                  "  pm.expect(cuerpo.numeroCuenta).to.match(/^100-/);",
+                  "});",
+                  "pm.collectionVariables.set('cuentaId', String(cuerpo.id));",
+                  "pm.collectionVariables.set('saldoEsperado', '0');",
+                  "if (pm.environment.name) pm.environment.set('cuentaId', String(cuerpo.id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": {{clienteId}},\n  \"tipoCuentaId\": 1\n}"
+            },
+            "url": "{{baseUrl}}/cuentas"
+          }
+        },
+        {
+          "name": "P005 Depósito válido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const movimiento = pm.response.json().movimiento;",
+                  "pm.test('P005 incrementa el saldo', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  pm.expect(movimiento.tipo).to.eql('deposito');",
+                  "  pm.expect(movimiento.monto).to.eql(100);",
+                  "  pm.expect(movimiento.saldoPosterior).to.eql(movimiento.saldoAnterior + 100);",
+                  "});",
+                  "pm.collectionVariables.set('saldoEsperado', String(movimiento.saldoPosterior));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuentaId\": {{cuentaId}},\n  \"monto\": 100,\n  \"descripcion\": \"Depósito de la prueba P005\"\n}"
+            },
+            "url": "{{baseUrl}}/depositos"
+          }
+        },
+        {
+          "name": "P006 Retiro con saldo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const movimiento = pm.response.json().movimiento;",
+                  "pm.test('P006 disminuye el saldo', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  pm.expect(movimiento.tipo).to.eql('retiro');",
+                  "  pm.expect(movimiento.monto).to.eql(40);",
+                  "  pm.expect(movimiento.saldoPosterior).to.eql(60);",
+                  "});",
+                  "pm.collectionVariables.set('saldoEsperado', String(movimiento.saldoPosterior));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuentaId\": {{cuentaId}},\n  \"monto\": 40,\n  \"descripcion\": \"Retiro de la prueba P006\"\n}"
+            },
+            "url": "{{baseUrl}}/retiros"
+          }
+        },
+        {
+          "name": "P007 Retiro superior al saldo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('P007 rechaza el retiro', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "  pm.expect(pm.response.json().codigo).to.eql('SALDO_INSUFICIENTE');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuentaId\": {{cuentaId}},\n  \"monto\": 500,\n  \"descripcion\": \"Retiro que debe rechazarse\"\n}"
+            },
+            "url": "{{baseUrl}}/retiros"
+          }
+        },
+        {
+          "name": "P007b El saldo no cambió",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('P007 el saldo permanece', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json().saldo).to.eql(Number(pm.collectionVariables.get('saldoEsperado')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/cuentas/{{cuentaId}}/saldo"
+          }
+        },
+        {
+          "name": "P008a Cuenta destino",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const cuerpo = pm.response.json();",
+                  "pm.test('Cuenta destino creada', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.collectionVariables.set('cuentaDestinoId', String(cuerpo.id));",
+                  "if (pm.environment.name) pm.environment.set('cuentaDestinoId', String(cuerpo.id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": {{clienteId}},\n  \"tipoCuentaId\": 2\n}"
+            },
+            "url": "{{baseUrl}}/cuentas"
+          }
+        },
+        {
+          "name": "P008 Transferencia válida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const cuerpo = pm.response.json();",
+                  "pm.test('P008 actualiza ambas cuentas', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  pm.expect(cuerpo.movimientoOrigen.saldoPosterior).to.eql(35);",
+                  "  pm.expect(cuerpo.movimientoDestino.saldoPosterior).to.eql(25);",
+                  "  pm.expect(cuerpo.transferencia.referencia).to.match(/^TRF-/);",
+                  "});",
+                  "pm.collectionVariables.set('saldoEsperado', '35');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuentaOrigenId\": {{cuentaId}},\n  \"cuentaDestinoId\": {{cuentaDestinoId}},\n  \"monto\": 25,\n  \"concepto\": \"Transferencia de la prueba P008\"\n}"
+            },
+            "url": "{{baseUrl}}/transferencias"
+          }
+        },
+        {
+          "name": "P009 Transferencia a la misma cuenta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('P009 rechaza la misma cuenta', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "  pm.expect(pm.response.json().codigo).to.eql('MISMA_CUENTA');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuentaOrigenId\": {{cuentaId}},\n  \"cuentaDestinoId\": {{cuentaId}},\n  \"monto\": 5,\n  \"concepto\": \"Debe rechazarse\"\n}"
+            },
+            "url": "{{baseUrl}}/transferencias"
+          }
+        },
+        {
+          "name": "P010a Desactivar cuenta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('La cuenta queda inactiva', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json().estado).to.eql('inactiva');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"estado\": \"inactiva\"\n}" },
+            "url": "{{baseUrl}}/cuentas/{{cuentaDestinoId}}/estado"
+          }
+        },
+        {
+          "name": "P010 Cuenta inactiva",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('P010 no permite la operación', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "  pm.expect(pm.response.json().codigo).to.eql('CUENTA_INACTIVA');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuentaId\": {{cuentaDestinoId}},\n  \"monto\": 10,\n  \"descripcion\": \"Depósito que debe rechazarse\"\n}"
+            },
+            "url": "{{baseUrl}}/depositos"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Consultas y reporte",
+      "item": [
+        {
+          "name": "Listar clientes",
+          "request": { "method": "GET", "url": "{{baseUrl}}/clientes?q=" }
+        },
+        {
+          "name": "Listar cuentas",
+          "request": { "method": "GET", "url": "{{baseUrl}}/cuentas" }
+        },
+        {
+          "name": "Movimientos de la cuenta",
+          "request": { "method": "GET", "url": "{{baseUrl}}/movimientos/cuenta/{{cuentaId}}" }
+        },
+        {
+          "name": "Consulta por texto",
+          "request": { "method": "GET", "url": "{{baseUrl}}/consultas?q=Ficticio" }
+        },
+        {
+          "name": "Reporte de operaciones",
+          "request": { "method": "GET", "url": "{{baseUrl}}/reportes/operaciones" }
+        },
+        {
+          "name": "Cerrar sesión",
+          "request": { "method": "POST", "url": "{{baseUrl}}/auth/logout" }
+        }
+      ]
+    }
+  ]
+}
