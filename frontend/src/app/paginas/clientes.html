@@ -1,50 +1,91 @@
-<header class="encabezado">
+<header class="pagina-encabezado">
   <div>
-    <p class="sobre">Fichas</p>
-    <h2>Clientes</h2>
+    <h1>Clientes</h1>
+    @if (!cargando() && !error()) {
+      <p class="descripcion">{{ clientes().length }} {{ clientes().length === 1 ? 'cliente registrado' : 'clientes registrados' }}</p>
+    }
   </div>
   <a class="boton" routerLink="/clientes/nuevo">Registrar cliente</a>
 </header>
-<form class="filtros" [formGroup]="busqueda" (ngSubmit)="cargar()">
-  <input formControlName="q" placeholder="Código, identificación, nombre o correo" />
-  <button class="boton secundario" type="submit">Buscar</button>
-</form>
-@if (mensaje()) { <p class="alerta ok">{{ mensaje() }}</p> }
-@if (error()) { <p class="alerta error">{{ error() }}</p> }
-<section class="tarjeta">
-  @if (clientes().length === 0) {
-    <p class="vacio">No hay clientes con ese criterio.</p>
+
+<section class="panel">
+  <div class="filtros" role="search">
+    <div class="campo crece">
+      <label for="buscar-cliente">Buscar</label>
+      <input id="buscar-cliente" type="search" [ngModel]="texto()" (ngModelChange)="filtrarTexto($event)"
+             placeholder="Nombre, código, identificación o correo" />
+    </div>
+    <div class="campo">
+      <label for="estado-cliente">Estado</label>
+      <select id="estado-cliente" [ngModel]="estado()" (ngModelChange)="filtrarEstado($event)">
+        <option value="todos">Todos</option>
+        <option value="activos">Activos</option>
+        <option value="inactivos">Inactivos</option>
+      </select>
+    </div>
+    @if (hayFiltros()) {
+      <button type="button" class="boton secundario" (click)="limpiar()">Limpiar filtros</button>
+    }
+  </div>
+
+  @if (cargando()) {
+    <div class="estado-carga" role="status"><span class="giro" aria-hidden="true"></span> Cargando clientes…</div>
+  } @else if (error()) {
+    <div class="panel-cuerpo">
+      <div class="alerta error" role="alert">
+        <span>{{ error() }}</span>
+        <button type="button" class="boton secundario pequeno" (click)="cargar()">Reintentar</button>
+      </div>
+    </div>
+  } @else if (clientes().length === 0) {
+    <div class="estado-vacio">
+      <strong>Aún no hay clientes registrados</strong>
+      <span>Registre el primer cliente para poder abrirle cuentas.</span>
+      <a class="boton" routerLink="/clientes/nuevo">Registrar cliente</a>
+    </div>
+  } @else if (filtrados().length === 0) {
+    <div class="estado-vacio">
+      <strong>Sin resultados</strong>
+      <span>Ningún cliente coincide con los filtros aplicados.</span>
+      <button type="button" class="boton secundario" (click)="limpiar()">Limpiar filtros</button>
+    </div>
   } @else {
-    <table>
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>Identificación</th>
-          <th>Nombre</th>
-          <th>Correo</th>
-          <th>Estado</th>
-          <th>Registro</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (cliente of clientes(); track cliente.id) {
+    <div class="tabla-contenedor">
+      <table>
+        <caption class="solo-lectores">Listado de clientes</caption>
+        <thead>
           <tr>
-            <td>{{ cliente.codigo }}</td>
-            <td>{{ cliente.identificacion }}</td>
-            <td>{{ cliente.nombres }} {{ cliente.apellidos }}</td>
-            <td>{{ cliente.correo }}</td>
-            <td><span class="pildora" [class.off]="!cliente.activo">{{ cliente.activo ? 'Activo' : 'Inactivo' }}</span></td>
-            <td>{{ fecha(cliente.fechaRegistro) }}</td>
-            <td class="acciones">
-              <a [routerLink]="['/clientes', cliente.id]">Editar</a>
-              <button type="button" class="enlace" (click)="cambiarActivo(cliente)">
-                {{ cliente.activo ? 'Desactivar' : 'Activar' }}
-              </button>
-            </td>
+            <th scope="col">Cliente</th>
+            <th scope="col">Identificación</th>
+            <th scope="col">Correo</th>
+            <th scope="col">Registro</th>
+            <th scope="col">Estado</th>
+            <th scope="col"><span class="solo-lectores">Acciones</span></th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (cliente of visibles(); track cliente.id) {
+            <tr>
+              <td>
+                <a class="celda-principal" [routerLink]="['/clientes', cliente.id]">{{ nombreCliente(cliente) }}</a>
+                <span class="celda-secundaria">{{ cliente.codigo }}</span>
+              </td>
+              <td class="num">{{ cliente.identificacion }}</td>
+              <td>{{ cliente.correo }}</td>
+              <td class="num">{{ soloFecha(cliente.fechaRegistro) }}</td>
+              <td><span class="etiqueta-estado" [class.inactivo]="!cliente.activo">{{ cliente.activo ? 'Activo' : 'Inactivo' }}</span></td>
+              <td class="acciones">
+                <a [routerLink]="['/clientes', cliente.id, 'editar']" [attr.aria-label]="'Editar a ' + nombreCliente(cliente)">Editar</a>
+                <button type="button" class="boton-texto" [class.peligro]="cliente.activo" (click)="cambiarActivo(cliente)"
+                        [attr.aria-label]="(cliente.activo ? 'Desactivar a ' : 'Activar a ') + nombreCliente(cliente)">
+                  {{ cliente.activo ? 'Desactivar' : 'Activar' }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-paginador [total]="filtrados().length" [(pagina)]="pagina" />
   }
 </section>

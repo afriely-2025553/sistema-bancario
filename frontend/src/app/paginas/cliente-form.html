@@ -1,43 +1,76 @@
-<header class="encabezado">
+<header class="pagina-encabezado">
   <div>
-    <p class="sobre">Ficha</p>
-    <h2>{{ id() ? 'Modificar cliente' : 'Registrar cliente' }}</h2>
+    <nav class="migas" aria-label="Ruta">
+      <a routerLink="/clientes">Clientes</a>
+      @if (cliente(); as actual) { / <a [routerLink]="['/clientes', actual.id]">{{ actual.codigo }}</a> }
+    </nav>
+    <h1>{{ id() ? 'Editar cliente' : 'Registrar cliente' }}</h1>
+    @if (cliente(); as actual) {
+      <p class="descripcion">{{ nombreCliente(actual) }} · {{ actual.codigo }}</p>
+    } @else if (!id()) {
+      <p class="descripcion">El código del cliente se asigna al guardar.</p>
+    }
   </div>
-  <a class="boton secundario" routerLink="/clientes">Volver</a>
 </header>
-<form class="tarjeta formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
-  @if (error()) { <p class="alerta error">{{ error() }}</p> }
-  <div class="campos">
-    <label>
-      Identificación ficticia
-      <input formControlName="identificacion" placeholder="DPI-FICT-1002999" />
-    </label>
-    <label>
-      Correo
-      <input type="email" formControlName="correo" placeholder="cliente@correo-ficticio.test" />
-    </label>
-    <label>
-      Nombres
-      <input formControlName="nombres" />
-    </label>
-    <label>
-      Apellidos
-      <input formControlName="apellidos" />
-    </label>
-    <label>
-      Fecha de nacimiento
-      <input type="date" formControlName="fechaNacimiento" />
-    </label>
-    <label>
-      Teléfono
-      <input formControlName="telefono" />
-    </label>
-    <label class="ancho">
-      Dirección
-      <input formControlName="direccion" />
-    </label>
-  </div>
-  <button class="boton" type="submit" [disabled]="enviando()">
-    {{ enviando() ? 'Guardando…' : 'Guardar' }}
-  </button>
-</form>
+
+@if (cargando()) {
+  <div class="panel estado-carga" role="status"><span class="giro" aria-hidden="true"></span> Cargando datos del cliente…</div>
+} @else {
+  <form class="panel form-ancho" [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+    <div class="panel-cuerpo formulario">
+      @if (error()) { <p class="alerta error" role="alert">{{ error() }}</p> }
+      <div class="campos">
+        <div class="campo">
+          <label for="nombres">Nombres</label>
+          <input id="nombres" formControlName="nombres" autocomplete="given-name" [attr.aria-invalid]="!!errorCampo('nombres')" aria-describedby="nombres-error" />
+          @if (errorCampo('nombres')) { <span id="nombres-error" class="error-campo">{{ errorCampo('nombres') }}</span> }
+        </div>
+        <div class="campo">
+          <label for="apellidos">Apellidos</label>
+          <input id="apellidos" formControlName="apellidos" autocomplete="family-name" [attr.aria-invalid]="!!errorCampo('apellidos')" aria-describedby="apellidos-error" />
+          @if (errorCampo('apellidos')) { <span id="apellidos-error" class="error-campo">{{ errorCampo('apellidos') }}</span> }
+        </div>
+        <div class="campo">
+          <label for="identificacion">Identificación (DPI o pasaporte)</label>
+          <input id="identificacion" formControlName="identificacion" placeholder="2547812360101" autocomplete="off"
+                 [attr.aria-invalid]="!!errorCampo('identificacion')" aria-describedby="identificacion-ayuda" />
+          @if (errorCampo('identificacion')) {
+            <span id="identificacion-ayuda" class="error-campo">{{ errorCampo('identificacion') }}</span>
+          } @else {
+            <span id="identificacion-ayuda" class="ayuda">Letras, números y guion. Debe ser única.</span>
+          }
+        </div>
+        <div class="campo">
+          <label for="correo">Correo electrónico</label>
+          <input id="correo" type="email" formControlName="correo" placeholder="nombre@dominio.com" autocomplete="email"
+                 [attr.aria-invalid]="!!errorCampo('correo')" aria-describedby="correo-error" />
+          @if (errorCampo('correo')) { <span id="correo-error" class="error-campo">{{ errorCampo('correo') }}</span> }
+        </div>
+        <div class="campo">
+          <label for="telefono">Teléfono <span class="opcional">(opcional)</span></label>
+          <input id="telefono" type="tel" formControlName="telefono" placeholder="5550-1234" autocomplete="tel"
+                 [attr.aria-invalid]="!!errorCampo('telefono')" aria-describedby="telefono-error" />
+          @if (errorCampo('telefono')) { <span id="telefono-error" class="error-campo">{{ errorCampo('telefono') }}</span> }
+        </div>
+        <div class="campo">
+          <label for="fechaNacimiento">Fecha de nacimiento <span class="opcional">(opcional)</span></label>
+          <input id="fechaNacimiento" type="date" formControlName="fechaNacimiento" [max]="hoy"
+                 [attr.aria-invalid]="!!errorCampo('fechaNacimiento')" aria-describedby="fecha-error" />
+          @if (errorCampo('fechaNacimiento')) { <span id="fecha-error" class="error-campo">{{ errorCampo('fechaNacimiento') }}</span> }
+        </div>
+        <div class="campo ancho">
+          <label for="direccion">Dirección <span class="opcional">(opcional)</span></label>
+          <input id="direccion" formControlName="direccion" placeholder="6a. avenida 10-25, zona 1, Guatemala" autocomplete="street-address"
+                 [attr.aria-invalid]="!!errorCampo('direccion')" aria-describedby="direccion-error" />
+          @if (errorCampo('direccion')) { <span id="direccion-error" class="error-campo">{{ errorCampo('direccion') }}</span> }
+        </div>
+      </div>
+      <div class="formulario-pie">
+        <a class="boton secundario" [routerLink]="volver()">Cancelar</a>
+        <button class="boton" type="submit" [disabled]="enviando()">
+          @if (enviando()) { <span class="giro" aria-hidden="true"></span> Guardando… } @else { {{ id() ? 'Guardar cambios' : 'Registrar cliente' }} }
+        </button>
+      </div>
+    </div>
+  </form>
+}

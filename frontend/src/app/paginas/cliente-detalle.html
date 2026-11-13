@@ -1,0 +1,90 @@
+@if (cargando()) {
+  <div class="panel estado-carga" role="status"><span class="giro" aria-hidden="true"></span> Cargando ficha del cliente…</div>
+} @else if (error()) {
+  <div class="pila">
+    <nav class="migas" aria-label="Ruta"><a routerLink="/clientes">Clientes</a></nav>
+    <div class="alerta error" role="alert">
+      <span>{{ error() }}</span>
+      <button type="button" class="boton secundario pequeno" (click)="cargar()">Reintentar</button>
+    </div>
+  </div>
+} @else if (cliente(); as actual) {
+  <header class="pagina-encabezado">
+    <div>
+      <nav class="migas" aria-label="Ruta"><a routerLink="/clientes">Clientes</a> / {{ actual.codigo }}</nav>
+      <h1>{{ nombreCliente(actual) }}</h1>
+      <p class="descripcion">
+        {{ actual.codigo }} ·
+        <span class="etiqueta-estado" [class.inactivo]="!actual.activo">{{ actual.activo ? 'Activo' : 'Inactivo' }}</span>
+      </p>
+    </div>
+    <div class="grupo-acciones">
+      <button type="button" class="boton" [class.peligro-borde]="actual.activo" [class.secundario]="!actual.activo"
+              [disabled]="procesando()" (click)="cambiarActivo()">
+        {{ actual.activo ? 'Desactivar' : 'Activar' }}
+      </button>
+      <a class="boton secundario" [routerLink]="['/clientes', actual.id, 'editar']">Editar datos</a>
+      @if (actual.activo) {
+        <a class="boton" routerLink="/cuentas/nueva" [queryParams]="{ clienteId: actual.id }">Abrir cuenta</a>
+      }
+    </div>
+  </header>
+
+  @if (!actual.activo) {
+    <p class="alerta aviso">Cliente inactivo: sus cuentas no pueden recibir depósitos, retiros ni transferencias.</p>
+  }
+
+  <div class="rejilla dos">
+    <section class="panel">
+      <div class="panel-cabecera"><h2>Datos personales</h2></div>
+      <dl class="panel-cuerpo datos">
+        <div><dt>Identificación</dt><dd class="num">{{ actual.identificacion }}</dd></div>
+        <div><dt>Fecha de nacimiento</dt><dd>{{ soloFecha(actual.fechaNacimiento) }}</dd></div>
+        <div><dt>Correo electrónico</dt><dd>{{ actual.correo }}</dd></div>
+        <div><dt>Teléfono</dt><dd>{{ actual.telefono || '—' }}</dd></div>
+        <div><dt>Dirección</dt><dd>{{ actual.direccion || '—' }}</dd></div>
+        <div><dt>Fecha de registro</dt><dd>{{ soloFecha(actual.fechaRegistro) }}</dd></div>
+      </dl>
+    </section>
+    <section class="panel">
+      <div class="panel-cabecera"><h2>Resumen</h2></div>
+      <dl class="panel-cuerpo datos">
+        <div><dt>Cuentas</dt><dd>{{ cuentas().length }}</dd></div>
+        <div><dt>Cuentas activas</dt><dd>{{ activas() }}</dd></div>
+        <div><dt>Saldo total</dt><dd class="num">{{ moneda(saldoTotal()) }}</dd></div>
+      </dl>
+    </section>
+  </div>
+
+  <section class="panel">
+    <div class="panel-cabecera"><h2>Cuentas del cliente</h2></div>
+    @if (cuentas().length === 0) {
+      <div class="estado-vacio">
+        <strong>El cliente no tiene cuentas</strong>
+        @if (actual.activo) {
+          <span>Abra una cuenta de ahorro o monetaria para empezar a operar.</span>
+          <a class="boton" routerLink="/cuentas/nueva" [queryParams]="{ clienteId: actual.id }">Abrir cuenta</a>
+        }
+      </div>
+    } @else {
+      <div class="tabla-contenedor">
+        <table>
+          <thead>
+            <tr><th scope="col">Número</th><th scope="col">Tipo</th><th scope="col">Apertura</th><th scope="col">Estado</th><th scope="col" class="derecha">Saldo</th></tr>
+          </thead>
+          <tbody>
+            @for (cuenta of cuentas(); track cuenta.id) {
+              <tr>
+                <td class="num"><a class="celda-principal" [routerLink]="['/cuentas', cuenta.id]">{{ cuenta.numeroCuenta }}</a></td>
+                <td>{{ cuenta.tipoCuenta }}</td>
+                <td class="num">{{ soloFecha(cuenta.fechaApertura) }}</td>
+                <td><span class="etiqueta-estado" [class.inactivo]="cuenta.estado !== 'activa'">{{ cuenta.estado === 'activa' ? 'Activa' : 'Inactiva' }}</span></td>
+                <td class="derecha num">{{ moneda(cuenta.saldo) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+}
