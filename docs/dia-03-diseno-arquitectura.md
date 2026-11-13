@@ -50,7 +50,7 @@ El diagrama correspondiente es `docs/diagramas/arquitectura.svg`.
 
 ## 3. Casos de uso
 
-El actor que opera el sistema es el cajero (u otro operador autenticado). El cliente bancario es un dato, no un usuario de la aplicación.
+El único actor es el operador autenticado (cajero o administrador). El cliente bancario es un dato, no un usuario de la aplicación.
 
 | Caso de uso | Resultado |
 | --- | --- |

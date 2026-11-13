@@ -1,24 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="980" height="760" viewBox="0 0 980 760">
-  <rect width="980" height="760" fill="#f4f1ea"/>
-  <text x="40" y="46" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#0e2a47">Flujo de inicio de sesión</text>
-  <g font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#0e2a47">
-    <rect x="340" y="80" width="300" height="52" rx="26" fill="#0e2a47"/>
-    <text x="490" y="112" text-anchor="middle" fill="#ffffff">Inicio</text>
-    <rect x="300" y="180" width="380" height="56" rx="8" fill="#ffffff" stroke="#0e2a47"/>
-    <text x="490" y="214" text-anchor="middle">El cajero envía usuario y contraseña</text>
-    <polygon points="490,280 680,340 490,400 300,340" fill="#fff8ea" stroke="#b0893e" stroke-width="2"/>
-    <text x="490" y="336" text-anchor="middle">¿Usuario activo</text>
-    <text x="490" y="356" text-anchor="middle">y contraseña válida?</text>
-    <rect x="300" y="450" width="380" height="56" rx="8" fill="#e7f4f1" stroke="#1f6f6a"/>
-    <text x="490" y="484" text-anchor="middle">Se entrega JWT y se abre el panel</text>
-    <rect x="680" y="300" width="250" height="70" rx="8" fill="#fdecec" stroke="#9b2c2c"/>
-    <text x="805" y="330" text-anchor="middle" fill="#9b2c2c">401</text>
-    <text x="805" y="350" text-anchor="middle" fill="#9b2c2c">Mensaje de error</text>
-    <rect x="340" y="560" width="300" height="52" rx="26" fill="#0e2a47"/>
-    <text x="490" y="592" text-anchor="middle" fill="#ffffff">Fin</text>
-    <path d="M490 132 V180 M490 236 V280 M490 400 V450 M490 506 V560" stroke="#0e2a47" stroke-width="1.6" fill="none"/>
-    <path d="M680 340 H680" stroke="#9b2c2c" stroke-width="1.6"/>
-    <text x="500" y="430" fill="#1f6f6a">Sí</text>
-    <text x="690" y="300" fill="#9b2c2c">No</text>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="672" viewBox="0 0 980 672">
+  <defs><marker id="f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#0e2a47"/></marker><marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#9b2c2c"/></marker></defs>
+  <rect width="980" height="672" fill="#f4f1ea"/>
+  <text x="40" y="52" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#0e2a47">Flujo de inicio de sesión</text>
+  <line x1="400" y1="152" x2="400" y2="194" stroke="#0e2a47" stroke-width="1.6" marker-end="url(#f)"/>
+  <line x1="400" y1="256" x2="400" y2="298" stroke="#0e2a47" stroke-width="1.6" marker-end="url(#f)"/>
+  <line x1="400" y1="412" x2="400" y2="454" stroke="#0e2a47" stroke-width="1.6" marker-end="url(#f)"/>
+  <line x1="400" y1="516" x2="400" y2="558" stroke="#0e2a47" stroke-width="1.6" marker-end="url(#f)"/>
+  <line x1="580" y1="356.0" x2="790" y2="356.0" stroke="#9b2c2c" stroke-width="1.6"/>
+  <text x="596" y="348.0" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#9b2c2c" font-weight="600">No</text>
+  <line x1="790" y1="356.0" x2="790" y2="444.0" stroke="#9b2c2c" stroke-width="1.6" marker-end="url(#r)"/>
+  <rect x="680" y="446.0" width="220" height="80" rx="8" fill="#fdecec" stroke="#9b2c2c" stroke-width="1.6"/>
+  <text x="790" y="481" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#9b2c2c">Responde 401 con</text>
+  <text x="790" y="501" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#9b2c2c">un mensaje de error</text>
+  <path d="M790 526.0 V586.0 H552" fill="none" stroke="#9b2c2c" stroke-width="1.6" marker-end="url(#r)"/>
+  <rect x="250" y="100" width="300" height="52" rx="26" fill="#0e2a47"/>
+  <text x="400" y="131" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#ffffff" font-weight="600">Inicio</text>
+  <rect x="200" y="196" width="400" height="60" rx="8" fill="#ffffff" stroke="#0e2a47" stroke-width="1.6"/>
+  <text x="400" y="231" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#0e2a47">El operador envía usuario y contraseña</text>
+  <path d="M400 300 L580.0 356.0 L400 412 L220.0 356.0 Z" fill="#fdf6e7" stroke="#b08a3e" stroke-width="1.6"/>
+  <text x="400" y="351" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#0e2a47">¿Usuario activo</text>
+  <text x="400" y="371" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#0e2a47">y contraseña válida?</text>
+  <text x="410" y="434" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#1f6f6a" font-weight="600">Sí</text>
+  <rect x="200" y="456" width="400" height="60" rx="8" fill="#e7f4f1" stroke="#1f6f6a" stroke-width="1.6"/>
+  <text x="400" y="491" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#0e2a47">Se entrega el JWT y se abre el inicio</text>
+  <rect x="250" y="560" width="300" height="52" rx="26" fill="#0e2a47"/>
+  <text x="400" y="591" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#ffffff" font-weight="600">Fin</text>
 </svg>

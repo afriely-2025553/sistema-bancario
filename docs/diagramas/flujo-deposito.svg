@@ -1,28 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="980" height="860" viewBox="0 0 980 860">
-  <rect width="980" height="860" fill="#f4f1ea"/>
-  <text x="40" y="46" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#0e2a47">Flujo de depósito</text>
-  <g font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#0e2a47">
-    <rect x="330" y="80" width="280" height="48" rx="24" fill="#0e2a47"/>
-    <text x="470" y="110" text-anchor="middle" fill="#ffffff">Inicio</text>
-    <rect x="270" y="160" width="400" height="52" rx="8" fill="#ffffff" stroke="#0e2a47"/>
-    <text x="470" y="192" text-anchor="middle">Recibir cuenta y monto con JWT</text>
-    <polygon points="470,250 670,310 470,370 270,310" fill="#fff8ea" stroke="#b0893e" stroke-width="2"/>
-    <text x="470" y="306" text-anchor="middle">¿Monto &gt; 0 y</text>
-    <text x="470" y="326" text-anchor="middle">con dos decimales?</text>
-    <polygon points="470,410 690,480 470,550 250,480" fill="#fff8ea" stroke="#b0893e" stroke-width="2"/>
-    <text x="470" y="472" text-anchor="middle">¿Cuenta existente,</text>
-    <text x="470" y="492" text-anchor="middle">activa y cliente activo?</text>
-    <rect x="250" y="590" width="440" height="70" rx="8" fill="#e7f4f1" stroke="#1f6f6a"/>
-    <text x="470" y="618" text-anchor="middle">Transacción: suma saldo y</text>
-    <text x="470" y="640" text-anchor="middle">inserta movimiento depósito</text>
-    <rect x="720" y="450" width="220" height="64" rx="8" fill="#fdecec" stroke="#9b2c2c"/>
-    <text x="830" y="478" text-anchor="middle" fill="#9b2c2c">Rechazar</text>
-    <text x="830" y="498" text-anchor="middle" fill="#9b2c2c">sin cambiar saldo</text>
-    <rect x="330" y="700" width="280" height="48" rx="24" fill="#0e2a47"/>
-    <text x="470" y="730" text-anchor="middle" fill="#ffffff">Fin</text>
-    <path d="M470 128 V160 M470 212 V250 M470 370 V410 M470 550 V590 M470 660 V700" stroke="#0e2a47" fill="none" stroke-width="1.6"/>
-    <path d="M690 480 H720" stroke="#9b2c2c" fill="none" stroke-width="1.6"/>
-    <text x="500" y="400" fill="#1f6f6a">Sí</text>
-    <text x="700" y="468" fill="#9b2c2c">No</text>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="848" viewBox="0 0 980 848">
+  <defs><marker id="f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#0e2a47"/></marker><marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#9b2c2c"/></marker></defs>
+  <rect width="980" height="848" fill="#f4f1ea"/>
+  <text x="40" y="52" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#0e2a47">Flujo de depósito</text>
+  <line x1="400" y1="152" x2="400" y2="194" stroke="#0e2a47" stroke-width="1.6" marker-end="url(#f)"/>
+  <line x1="400" y1="256" x2="400" y2="298" stroke="#0e2a47" stroke-width="1.6" marker-end="url(#f)"/>
+  <line x1="400" y1="412" x2="400" y2="454" stroke="#0e2a47" stroke-width="1.6" marker-end="url(#f)"/>
+  <line x1="400" y1="568" x2="400" y2="610" stroke="#0e2a47" stroke-width="1.6" marker-end="url(#f)"/>
+  <line x1="400" y1="692" x2="400" y2="734" stroke="#0e2a47" stroke-width="1.6" marker-end="url(#f)"/>
+  <line x1="580" y1="356.0" x2="790" y2="356.0" stroke="#9b2c2c" stroke-width="1.6"/>
+  <text x="596" y="348.0" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#9b2c2c" font-weight="600">No</text>
+  <line x1="580" y1="512.0" x2="790" y2="512.0" stroke="#9b2c2c" stroke-width="1.6"/>
+  <text x="596" y="504.0" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#9b2c2c" font-weight="600">No</text>
+  <line x1="790" y1="356.0" x2="790" y2="610.0" stroke="#9b2c2c" stroke-width="1.6" marker-end="url(#r)"/>
+  <rect x="680" y="612.0" width="220" height="80" rx="8" fill="#fdecec" stroke="#9b2c2c" stroke-width="1.6"/>
+  <text x="790" y="647" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#9b2c2c">Rechazar sin</text>
+  <text x="790" y="667" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#9b2c2c">cambiar el saldo</text>
+  <path d="M790 692.0 V762.0 H552" fill="none" stroke="#9b2c2c" stroke-width="1.6" marker-end="url(#r)"/>
+  <rect x="250" y="100" width="300" height="52" rx="26" fill="#0e2a47"/>
+  <text x="400" y="131" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#ffffff" font-weight="600">Inicio</text>
+  <rect x="200" y="196" width="400" height="60" rx="8" fill="#ffffff" stroke="#0e2a47" stroke-width="1.6"/>
+  <text x="400" y="231" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#0e2a47">Recibir cuenta y monto (con JWT)</text>
+  <path d="M400 300 L580.0 356.0 L400 412 L220.0 356.0 Z" fill="#fdf6e7" stroke="#b08a3e" stroke-width="1.6"/>
+  <text x="400" y="351" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#0e2a47">¿Monto mayor que 0 y con</text>
+  <text x="400" y="371" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#0e2a47">dos decimales como máximo?</text>
+  <text x="410" y="434" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#1f6f6a" font-weight="600">Sí</text>
+  <path d="M400 456 L580.0 512.0 L400 568 L220.0 512.0 Z" fill="#fdf6e7" stroke="#b08a3e" stroke-width="1.6"/>
+  <text x="400" y="507" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#0e2a47">¿Cuenta existente, activa</text>
+  <text x="400" y="527" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#0e2a47">y con cliente activo?</text>
+  <text x="410" y="590" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#1f6f6a" font-weight="600">Sí</text>
+  <rect x="200" y="612" width="400" height="80" rx="8" fill="#e7f4f1" stroke="#1f6f6a" stroke-width="1.6"/>
+  <text x="400" y="647" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#0e2a47">Transacción: sumar al saldo e insertar</text>
+  <text x="400" y="667" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#0e2a47">el movimiento de depósito</text>
+  <rect x="250" y="736" width="300" height="52" rx="26" fill="#0e2a47"/>
+  <text x="400" y="767" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#ffffff" font-weight="600">Fin</text>
 </svg>
