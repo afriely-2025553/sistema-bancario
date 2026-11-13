@@ -24,7 +24,7 @@
     "onAutoForward": "ignore"
   },
   "postCreateCommand": "bash .devcontainer/post-create.sh",
-  "postStartCommand": "bash .devcontainer/post-start.sh",
+  "postStartCommand": "bash .devcontainer/estado.sh",
   "customizations": {
     "codespaces": {
       "openFiles": ["README.md"]

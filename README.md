@@ -31,13 +31,20 @@ Se puede probar el sistema completo (MySQL, API y Angular) en GitHub Codespaces,
 
 1. Pulse el botón **Open in GitHub Codespaces** de arriba (o **Code → Codespaces → Create codespace on main**) con una cuenta de GitHub.
 2. Espere a que termine la preparación. La primera vez tarda unos minutos: instala dependencias, crea la base `banco_academico` y carga `schema.sql` y `seed.sql`.
-3. Al arrancar, la API y Angular se levantan solos en segundo plano. El navegador abre el puerto **4200 (Sistema bancario)**; si no se abre, vaya a la pestaña **PORTS** y abra la dirección del puerto 4200.
+3. La API y Angular corren en un contenedor aparte, `servicios`, que los levanta en cuanto terminan de instalarse las dependencias y los reinicia si se detienen. El navegador abre el puerto **4200 (Sistema bancario)**; si no se abre, vaya a la pestaña **PORTS** y abra la dirección del puerto 4200.
 4. Entre con una de las cuentas de la sección [Credenciales ficticias de prueba](#credenciales-ficticias-de-prueba).
 5. Los registros quedan en `logs/backend.log` y `logs/frontend.log`. Para regresar a la semilla: `cd backend && npm run db:init`. Para las pruebas: `cd backend && npm test`.
 
 El frontend llama a la API por la ruta relativa `/api`, y el servidor de desarrollo de Angular la reenvía al backend del puerto 3000 (`frontend/proxy.conf.json`). Por eso basta con el puerto 4200.
 
 Cada push o pull request a `main` ejecuta el flujo **CI** de GitHub Actions: levanta MySQL 8, inicializa la base, compila backend y frontend, corre las pruebas Jest P001-P010 y la colección de Postman con Newman.
+
+### Solución de problemas en Codespaces
+
+- **El puerto 4200 responde 502 o no carga.** La primera compilación de Angular tarda uno o dos minutos después de instalar dependencias. Ejecute `bash .devcontainer/estado.sh` en la terminal: espera a que respondan los puertos 3000 y 4200 y, si no lo hacen, muestra las últimas líneas de `logs/backend.log` y `logs/frontend.log`.
+- **`logs/frontend.log` dice «Esperando a que post-create.sh instale las dependencias».** La instalación inicial no terminó o falló. Revise el registro de creación (**Codespaces: View Creation Log**) y vuelva a ejecutar `bash .devcontainer/post-create.sh`.
+- **No ejecute `npm start` ni `npm run dev` a mano mientras el contenedor `servicios` esté activo:** los puertos ya están ocupados. Los cambios en el código se recargan solos.
+- **Algo quedó en mal estado.** Use **Codespaces: Rebuild Container** desde la paleta de comandos; la base y las dependencias se vuelven a preparar.
 
 Detenga el codespace cuando termine (**Codespaces → Stop codespace**) para no gastar las horas gratuitas de su cuenta.
 

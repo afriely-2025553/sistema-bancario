@@ -17,6 +17,31 @@ services:
       db:
         condition: service_healthy
 
+  # Levanta la API y Angular fuera de los comandos del ciclo de vida del devcontainer.
+  # Comparte la red de MySQL, igual que «app», así que los puertos 3000 y 4200
+  # se ven desde el contenedor de trabajo y Codespaces los reenvía.
+  servicios:
+    image: mcr.microsoft.com/devcontainers/javascript-node:22
+    init: true
+    user: root
+    volumes:
+      - ..:/proyecto:cached
+    working_dir: /proyecto
+    command: bash /proyecto/.devcontainer/servicios.sh
+    network_mode: service:db
+    restart: unless-stopped
+    environment:
+      RAIZ_PROYECTO: /proyecto
+      NG_CLI_ANALYTICS: "false"
+      DB_HOST: 127.0.0.1
+      DB_PORT: "3306"
+      DB_USER: banco_app
+      DB_PASSWORD: BancoFicticio123!
+      DB_NAME: banco_academico
+    depends_on:
+      db:
+        condition: service_healthy
+
   db:
     image: mysql:8.4
     restart: unless-stopped
