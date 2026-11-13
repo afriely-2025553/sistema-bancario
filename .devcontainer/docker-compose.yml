@@ -1,0 +1,39 @@
+services:
+  app:
+    image: mcr.microsoft.com/devcontainers/javascript-node:22
+    volumes:
+      - ../..:/workspaces:cached
+    command: sleep infinity
+    # Comparte la red de MySQL: dentro del contenedor la base está en 127.0.0.1:3306.
+    network_mode: service:db
+    environment:
+      NG_CLI_ANALYTICS: "false"
+      DB_HOST: 127.0.0.1
+      DB_PORT: "3306"
+      DB_USER: banco_app
+      DB_PASSWORD: BancoFicticio123!
+      DB_NAME: banco_academico
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      # Credenciales ficticias, solo para la práctica.
+      MYSQL_ROOT_PASSWORD: root-ficticio
+      MYSQL_DATABASE: banco_academico
+      MYSQL_USER: banco_app
+      MYSQL_PASSWORD: BancoFicticio123!
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot-ficticio"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  mysql-data:

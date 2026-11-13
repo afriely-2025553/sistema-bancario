@@ -12,7 +12,8 @@ import {
   TransferenciaResultado,
 } from './modelos';
 
-const BASE = 'http://localhost:3000/api';
+// Ruta relativa: en desarrollo el proxy de Angular (proxy.conf.json) la envía al backend del puerto 3000.
+const BASE = '/api';
 
 @Injectable({ providedIn: 'root' })
 export class Api {

@@ -1,5 +1,8 @@
 # Sistema bancario académico
 
+[![CI](https://github.com/afriely-2025553/sistema-bancario/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/afriely-2025553/sistema-bancario/actions/workflows/ci.yml)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/afriely-2025553/sistema-bancario?quickstart=1)
+
 Sistema de práctica para registrar clientes ficticios, abrir cuentas y operar depósitos, retiros y transferencias. Integra una interfaz en Angular, una API REST en Node.js y una base MySQL. No administra dinero real: las personas, los documentos, las contraseñas y los saldos de este repositorio son inventados.
 
 | Dato | Valor |
@@ -21,6 +24,22 @@ Un operador inicia sesión y puede:
 - depositar, retirar y transferir, siempre dentro de una transacción SQL;
 - consultar movimientos e identificar clientes o cuentas;
 - ver un reporte de depósitos, retiros y transferencias.
+
+## Probar en línea
+
+Se puede probar el sistema completo (MySQL, API y Angular) en GitHub Codespaces, sin instalar nada:
+
+1. Pulse el botón **Open in GitHub Codespaces** de arriba (o **Code → Codespaces → Create codespace on main**) con una cuenta de GitHub.
+2. Espere a que termine la preparación. La primera vez tarda unos minutos: instala dependencias, crea la base `banco_academico` y carga `schema.sql` y `seed.sql`.
+3. Al arrancar, la API y Angular se levantan solos en segundo plano. El navegador abre el puerto **4200 (Sistema bancario)**; si no se abre, vaya a la pestaña **PORTS** y abra la dirección del puerto 4200.
+4. Entre con `cajero` / `Cajero123!` (o `administrador` / `Admin123!`). Son credenciales ficticias.
+5. Los registros quedan en `logs/backend.log` y `logs/frontend.log`. Para regresar a la semilla: `cd backend && npm run db:init`. Para las pruebas: `cd backend && npm test`.
+
+El frontend llama a la API por la ruta relativa `/api`, y el servidor de desarrollo de Angular la reenvía al backend del puerto 3000 (`frontend/proxy.conf.json`). Por eso basta con el puerto 4200.
+
+Cada push o pull request a `main` ejecuta el flujo **CI** de GitHub Actions: levanta MySQL 8, inicializa la base, compila backend y frontend, corre las pruebas Jest P001-P010 y la colección de Postman con Newman.
+
+Detenga el codespace cuando termine (**Codespaces → Stop codespace**) para no gastar las horas gratuitas de su cuenta.
 
 ## Reglas de negocio
 
@@ -56,6 +75,8 @@ Base de datos de desarrollo, también ficticia:
 ## Estructura
 
 ```
+.devcontainer/ entorno de GitHub Codespaces (MySQL 8 y Node 22)
+.github/      flujo de CI de GitHub Actions
 frontend/     Angular y TypeScript
 backend/      API Express y TypeScript
 database/     schema.sql y seed.sql
@@ -65,7 +86,7 @@ postman/      colección y entorno
 
 ## Requisitos
 
-- Node.js 22
+- Node.js 22 (22.22.3 o posterior, que exige Angular 22)
 - npm 10
 - MySQL 8
 - Un navegador actual
@@ -110,7 +131,7 @@ npm install
 npm start
 ```
 
-Abra `http://localhost:4200`. La pantalla de acceso recuerda las credenciales ficticias.
+Abra `http://localhost:4200`. La pantalla de acceso recuerda las credenciales ficticias. `npm start` usa `proxy.conf.json`, que envía las llamadas a `/api` al backend en `http://127.0.0.1:3000`; por eso el backend debe estar en marcha antes de entrar.
 
 ### 4. Pruebas
 
