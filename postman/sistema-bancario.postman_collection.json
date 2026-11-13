@@ -106,7 +106,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"identificacion\": \"DPI-PM-{{$timestamp}}\",\n  \"nombres\": \"Cliente\",\n  \"apellidos\": \"Ficticio Postman\",\n  \"correo\": \"postman{{$timestamp}}@correo-ficticio.test\",\n  \"telefono\": \"55501999\",\n  \"direccion\": \"Calle de la coleccion\"\n}"
+              "raw": "{\n  \"identificacion\": \"DPI-PM-{{$timestamp}}\",\n  \"nombres\": \"Cliente\",\n  \"apellidos\": \"Postman Prueba\",\n  \"correo\": \"postman{{$timestamp}}@correo.test\",\n  \"telefono\": \"55501999\",\n  \"direccion\": \"Calle de la coleccion\"\n}"
             },
             "url": "{{baseUrl}}/clientes"
           }
@@ -403,7 +403,7 @@
         },
         {
           "name": "Consulta por texto",
-          "request": { "method": "GET", "url": "{{baseUrl}}/consultas?q=Ficticio" }
+          "request": { "method": "GET", "url": "{{baseUrl}}/consultas?q=Lopez" }
         },
         {
           "name": "Reporte de operaciones",

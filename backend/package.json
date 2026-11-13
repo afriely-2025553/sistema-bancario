@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "author": "afriely-2025553",
-  "description": "API REST del sistema bancario académico. Solo datos ficticios.",
+  "description": "API REST del sistema bancario académico.",
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",

@@ -65,7 +65,7 @@ export function exigirAuth(req: Request, _res: Response, next: NextFunction): vo
     };
     next();
   } catch {
-    next(new ErrorApp(401, 'La sesión no es válida o expiró.', 'SESION_INVALIDA'));
+    next(new ErrorApp(401, 'La sesión expiró o no es válida. Inicie sesión de nuevo.', 'SESION_INVALIDA'));
   }
 }
 
@@ -108,6 +108,6 @@ routerAuth.get(
 
 routerAuth.post('/logout', exigirAuth, (_req, res) => {
   res.json({
-    mensaje: 'Sesión cerrada. Descarte el token en el navegador; el servidor no lo vuelve a exigir.',
+    mensaje: 'Sesión cerrada.',
   });
 });

@@ -29,13 +29,19 @@ export function manejadorErrores(error: unknown, _req: Request, res: Response, _
   });
 }
 
+/** «El cliente» → «El identificador del cliente no es válido.»; «La cuenta» → «… de la cuenta …». */
+function mensajeIdInvalido(etiqueta: string): string {
+  const complemento = etiqueta.replace(/^El /, 'del ').replace(/^La /, 'de la ');
+  return `El identificador ${complemento} no es válido.`;
+}
+
 export function enteroPositivo(valor: string, etiqueta: string): number {
   if (!/^\d+$/.test(valor)) {
-    throw new ErrorApp(400, `${etiqueta} no es válido.`, 'ID_INVALIDO');
+    throw new ErrorApp(400, mensajeIdInvalido(etiqueta), 'ID_INVALIDO');
   }
   const numero = Number(valor);
   if (!Number.isSafeInteger(numero) || numero <= 0) {
-    throw new ErrorApp(400, `${etiqueta} no es válido.`, 'ID_INVALIDO');
+    throw new ErrorApp(400, mensajeIdInvalido(etiqueta), 'ID_INVALIDO');
   }
   return numero;
 }

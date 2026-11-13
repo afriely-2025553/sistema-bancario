@@ -30,12 +30,12 @@ export const esquemaCliente = z.object({
     .string({ required_error: 'Los nombres son obligatorios.' })
     .trim()
     .min(2, 'Los nombres deben tener al menos 2 caracteres.')
-    .max(80),
+    .max(80, 'Los nombres admiten como máximo 80 caracteres.'),
   apellidos: z
     .string({ required_error: 'Los apellidos son obligatorios.' })
     .trim()
     .min(2, 'Los apellidos deben tener al menos 2 caracteres.')
-    .max(80),
+    .max(80, 'Los apellidos admiten como máximo 80 caracteres.'),
   fechaNacimiento: z
     .union([z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'La fecha debe usar el formato AAAA-MM-DD.'), z.literal(''), z.null()])
     .optional()
@@ -45,7 +45,7 @@ export const esquemaCliente = z.object({
     .string({ required_error: 'El correo es obligatorio.' })
     .trim()
     .email('El correo no es válido.')
-    .max(150),
+    .max(150, 'El correo admite como máximo 150 caracteres.'),
   direccion: opcionalTexto(255),
 });
 
@@ -53,7 +53,7 @@ export type DatosCliente = z.infer<typeof esquemaCliente>;
 
 export const esquemaEstadoCuenta = z.object({
   estado: z.enum(['activa', 'inactiva'], {
-    errorMap: () => ({ message: 'El estado debe ser activa o inactiva.' }),
+    errorMap: () => ({ message: 'El estado debe ser «activa» o «inactiva».' }),
   }),
 });
 
@@ -77,7 +77,7 @@ export function leerMonto(valor: unknown): string {
     throw new ErrorApp(400, 'El monto admite como máximo dos decimales.', 'MONTO_DECIMALES');
   }
   if (centavos > 100_000_000) {
-    throw new ErrorApp(400, 'El monto supera el límite académico de 1000000.00.', 'MONTO_LIMITE');
+    throw new ErrorApp(400, 'El monto supera el límite por operación de Q 1,000,000.00.', 'MONTO_LIMITE');
   }
   return (centavos / 100).toFixed(2);
 }

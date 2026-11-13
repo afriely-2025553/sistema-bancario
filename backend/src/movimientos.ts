@@ -75,7 +75,7 @@ const esquemaMovimiento = z.object({
     .int()
     .positive(),
   tipo: z.enum(['deposito', 'retiro'], {
-    errorMap: () => ({ message: 'El tipo del movimiento directo debe ser deposito o retiro.' }),
+    errorMap: () => ({ message: 'El tipo de movimiento debe ser «deposito» o «retiro».' }),
   }),
   monto: z.unknown(),
   descripcion: z.union([z.string().trim().max(255), z.literal(''), z.null()]).optional(),

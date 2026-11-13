@@ -20,7 +20,7 @@ async function main(): Promise<void> {
   await conexion.query(fs.readFileSync(path.join(carpeta, 'schema.sql'), 'utf8'));
   await conexion.query(fs.readFileSync(path.join(carpeta, 'seed.sql'), 'utf8'));
   await conexion.end();
-  console.log(`Base ficticia lista en ${db.database}.`);
+  console.log(`Base de datos lista: ${db.database}.`);
 }
 
 main().catch((error: unknown) => {

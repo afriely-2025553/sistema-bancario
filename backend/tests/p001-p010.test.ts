@@ -15,7 +15,7 @@ function identificacionUnica(): { identificacion: string; correo: string } {
   const marca = `${Date.now()}${secuencia}`;
   return {
     identificacion: `DPI-TEST-${marca}`,
-    correo: `prueba${marca}@correo-ficticio.test`,
+    correo: `prueba${marca}@correo.test`,
   };
 }
 
@@ -34,7 +34,7 @@ async function clienteYCuenta(token: string, saldoInicial = 0): Promise<{ client
     .send({
       identificacion: unico.identificacion,
       nombres: 'Cliente',
-      apellidos: 'Ficticio Prueba',
+      apellidos: 'De Prueba',
       correo: unico.correo,
     });
   const cuenta = await request(app)
@@ -115,7 +115,7 @@ describe('Pruebas obligatorias P001-P010', () => {
       .send({
         identificacion: unico.identificacion,
         nombres: 'Cliente',
-        apellidos: 'Ficticio Alta',
+        apellidos: 'Alta Prueba',
         correo: unico.correo,
         telefono: '55501888',
       });
